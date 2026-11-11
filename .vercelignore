@@ -1,0 +1,15 @@
+# never upload secrets, local output or other apps to the build service
+.git
+.vercel
+.env
+.env.*
+!.env.example
+dev-logins.local.txt
+node_modules
+**/node_modules
+.next
+**/.next
+*.tsbuildinfo
+.shots
+packages/db/dist
+apps/mobile

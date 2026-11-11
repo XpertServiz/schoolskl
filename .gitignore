@@ -24,3 +24,6 @@ apps/mobile/web-build
 # scratch output from the verification scripts
 .shots
 packages/db/dist
+
+.vercel
+.env*

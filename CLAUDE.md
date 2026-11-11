@@ -146,3 +146,9 @@ Phase 4 **done**: marketing site, lead capture. **Not done**: Pop-Up Campus 3D, 
 
 ## Open questions
 See brief §22 (product name/domains, pilot schools, pricing, payment partners, WhatsApp BSP, hosting region, legal opinion on tracking/profiling/face attendance, board formats, tax).
+
+### Hosting — GitHub + Vercel
+- Repo: `github.com/XpertServiz/schoolskl` (public). Vercel project `schoolskl` (team `khanather`), production alias `https://schoolskl.vercel.app`. Project settings: root directory `apps/web`, install `cd ../.. && npm ci` (a plain `npm ci` inside `apps/web` skipped the workspace and broke the `@/` imports), source files outside root enabled.
+- **`.vercelignore` is required**: the CLI upload ignored `.gitignore` and shipped `dev-logins.local.txt` once (that deployment was deleted). Deploy with `vercel deploy --prod` from the repo root only after checking `.vercelignore`.
+- Env set on Vercel (production): `NEXT_PUBLIC_{SITE_URL,ROOT_DOMAIN,PRODUCT_NAME,SUPABASE_URL,SUPABASE_ANON_KEY}`, `SUPABASE_SERVICE_ROLE_KEY` (sensitive), `NOTIFY_DRY_RUN`. **`CRON_SECRET` not set** → job routes answer 401 (safe). No `SUPABASE_DB_URL` on Vercel (tools only).
+- **Only the marketing site works on `*.vercel.app`**: routing is by subdomain (`app.`, `vendor.`, `{slug}.`), and vercel.app cannot serve those. `/portal` and `/vendor` on the root host are 404 by design. A real domain with a wildcard (`*.example.pk`) plus `NEXT_PUBLIC_ROOT_DOMAIN` set to it (needs a rebuild: inlined) is required before the portal is reachable online.
