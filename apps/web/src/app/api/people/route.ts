@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 import { findOrCreateLogin } from '@/lib/invite';
 import { allow, clientIp } from '@/lib/rate-limit';
+import { ADMIN_ROLES } from '@/lib/roles';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -42,7 +43,10 @@ export async function POST(req: Request) {
     if (data?.role !== 'vendor_super_admin') return json({ ok: false, code: 'forbidden' }, 403);
   } else {
     const { data: pa } = await sb.rpc('people_access');
-    if (!(pa as { can?: boolean } | null)?.can) return json({ ok: false, code: 'forbidden' }, 403);
+    const access = pa as { can?: boolean; admin_roles?: boolean } | null;
+    if (!access?.can) return json({ ok: false, code: 'forbidden' }, 403);
+    // admin-level roles need a two-step sign-in session: say so now, before any login is created (the database enforces it again)
+    if (!access.admin_roles && ADMIN_ROLES.has(b.role)) return json({ ok: false, code: 'mfa' }, 400);
   }
 
   let login: { id: string };
