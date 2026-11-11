@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useIsFocused } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRef, type ComponentProps, type ReactNode } from 'react';
 import { ActivityIndicator, Animated, Pressable, StyleSheet, Text, TextInput, View, type TextInputProps, type TextProps, type ViewStyle } from 'react-native';
@@ -40,9 +41,11 @@ export function Press({ children, onPress, disabled, style, label, outer }: { ch
 
 /** Background for every screen: the night sky (stars, moon, ridges) with a soft warm glow, inside the safe area. */
 export function Screen({ children }: { children: ReactNode }) {
+  // Tab screens are see-through (the night sky is drawn ONCE behind the whole app, app/_layout.tsx), so a tab that is not in front must
+  // be hidden or earlier tabs show through the current one (seen on the browser build; phones detach them, this makes it certain).
+  const focused = useIsFocused();
   return (
-    // transparent: the night sky is drawn ONCE behind the whole app (app/_layout.tsx), not again on every screen
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, display: focused ? 'flex' : 'none' }}>
       <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>{children}</SafeAreaView>
     </View>
   );
