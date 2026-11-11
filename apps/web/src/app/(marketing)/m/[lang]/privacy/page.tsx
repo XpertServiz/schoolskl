@@ -1,7 +1,11 @@
 import { t, type Locale } from '@ilmora/i18n';
 import { asLocale } from '@/lib/locale';
+import { seo } from '@/lib/seo';
 
-export const metadata = { title: 'Privacy and children' };
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
+  const l = asLocale((await params).lang);
+  return seo(l, '/privacy', t(l, 'marketing.nav.privacy'));
+}
 
 /**
  * Product promises, each backed by something enforced in code: tenant isolation is database RLS, tracking needs recorded consent, no ad/tracker

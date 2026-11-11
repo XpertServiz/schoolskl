@@ -170,3 +170,11 @@ input[type='checkbox'], input[type='radio'] { accent-color: var(--accent); width
 }
 .quick { display: flex; flex-wrap: wrap; gap: .6rem; margin: .25rem 0 1.25rem; }
 .quick .btn { padding: .7rem 1.1rem; }
+
+/* ---- super-admin dashboard and visitors */
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: .9rem; margin: 1rem 0 1.5rem; }
+.kpis .card { display: grid; gap: .15rem; text-decoration: none; color: inherit; }
+.kpis a.card:hover { border-color: var(--accent); }
+.kpi { font-size: 2rem; line-height: 1.1; font-family: Sora, Inter, system-ui, sans-serif; }
+.hbar { height: .7rem; border-radius: 6px; background: var(--surface-2, #1c2733); overflow: hidden; }
+.hbar span { display: block; height: 100%; background: var(--accent); border-radius: 6px; }

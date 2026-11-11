@@ -4,9 +4,16 @@ import { asLocale } from '@/lib/locale';
 import Campus3DLazy from '@/components/landing/Campus3DLazy';
 import NightSkyLazy from '@/components/landing/NightSkyLazy';
 import { Icons } from '@/components/landing/icons';
+import { MediaEmbed } from '@/components/landing/MediaEmbed';
 import { PhoneMock } from '@/components/landing/PhoneMock';
+import { embedFor } from '@/lib/embed';
+import { homeJsonLd, seo } from '@/lib/seo';
+import { getSiteContent } from '@/lib/site-content';
 
-export const metadata = { description: 'School management for Pakistan — fees, results, attendance, the school bus and parent apps, in English and Urdu.' };
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
+  const l = asLocale((await params).lang);
+  return seo(l, '/');
+}
 
 // Few words, big visuals. Every tile is something that works today; nothing here describes an unbuilt feature.
 const TILES = [
@@ -18,11 +25,16 @@ const TILES = [
 export default async function Home({ params }: { params: Promise<{ lang: string }> }) {
   const locale: Locale = asLocale((await params).lang);
   const tr = (k: string, v?: Record<string, string | number>) => t(locale, k, v);
+  const { media } = await getSiteContent();
+  const demo = media.filter((m) => m.kind === 'demo');
+  const reels = media.filter((m) => m.kind === 'reel');
+  const title = (m: { title_en: string; title_ur: string }) => (locale === 'ur' && m.title_ur ? m.title_ur : m.title_en);
   const moment = (cls: string, icon: React.ReactNode, b: string, s: string) => (
     <div className={`moment ${cls}`} aria-hidden="true"><span className="ic">{icon}</span><span><b>{tr(b)}</b><small>{tr(s)}</small></span></div>
   );
   return (
     <div>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: homeJsonLd(locale) }} />
       {/* ------------------------------------------------------------ hero: words, then the 3D campus with live moments round it */}
       <section className="hero">
         <NightSkyLazy />
@@ -59,6 +71,19 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
           ))}
         </div>
       </section>
+
+      {/* ------------------------------------------------------------ demo video + reels (managed in Vendor Console → Website) */}
+      {demo.length + reels.length > 0 ? (
+        <section className="l-section l-wrap watch">
+          <h2 className="c reveal">{tr('site.watch')}</h2>
+          {demo.slice(0, 1).map((m) => <MediaEmbed key={m.id} title={title(m)} src={embedFor(m.url)?.src ?? null} href={m.url} portrait={false} play={tr('site.play')} open={tr('site.open')} />)}
+          {reels.length ? (
+            <div className="reels">
+              {reels.map((m) => <MediaEmbed key={m.id} title={title(m)} src={embedFor(m.url)?.src ?? null} href={m.url} portrait play={tr('site.play')} open={tr('site.open')} />)}
+            </div>
+          ) : null}
+        </section>
+      ) : null}
 
       {/* ------------------------------------------------------------ apps */}
       <section className="l-section apps-band">

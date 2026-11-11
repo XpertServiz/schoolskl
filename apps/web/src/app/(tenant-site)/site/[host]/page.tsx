@@ -11,6 +11,14 @@ export function generateStaticParams() { return []; }
 
 const text = (v: unknown, max: number): string | null => (typeof v === 'string' && v.trim() ? v.trim().slice(0, max) : null);
 
+export async function generateMetadata({ params }: { params: Promise<{ host: string }> }) {
+  const tenant = await resolveTenant(decodeURIComponent((await params).host)); // same cached lookup as the page
+  if (!tenant) return { robots: { index: false, follow: false } };
+  const b = tenant.branding ?? {};
+  const description = text(b.tagline, 160) ?? text(b.about, 160) ?? undefined;
+  return { title: tenant.name, description, openGraph: { title: tenant.name, description, type: 'website' as const }, robots: { index: true, follow: true } };
+}
+
 /**
  * A school's public front door. It shows only what resolve_tenant returns (public branding) — never any record. Branding fields are plain
  * text rendered as text (no HTML), and sign-in leads to the app host where the real session and RLS take over.

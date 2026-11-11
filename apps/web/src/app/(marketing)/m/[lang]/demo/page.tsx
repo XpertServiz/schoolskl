@@ -1,9 +1,13 @@
 import { Suspense } from 'react';
 import { t, type Locale } from '@ilmora/i18n';
 import { asLocale } from '@/lib/locale';
+import { seo } from '@/lib/seo';
 import { DemoFlash } from './flash';
 
-export const metadata = { title: 'Book a demo' };
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
+  const l = asLocale((await params).lang);
+  return seo(l, '/demo', t(l, 'marketing.nav.demo'));
+}
 
 /**
  * Plain HTML form → /api/demo (no client JS needed, works on the weakest phone). The hidden "website" field is a honeypot for bots.

@@ -20,7 +20,10 @@ export async function middleware(req: NextRequest) {
   const internal = pathname.startsWith('/site/') || pathname.startsWith('/vendor') || pathname.startsWith('/portal') || pathname === '/m' || pathname.startsWith('/m/');
 
   switch (k.kind) {
-    case 'root':
+    case 'root': {
+      // Urdu twins of the public pages live at real addresses (/ur, /ur/pricing …) so search engines can index them (English stays at /…)
+      const ur = /^\/ur(\/.*)?$/.exec(pathname);
+      if (ur) return rewrite(req, `/m/ur${ur[1] ?? ''}`, search);
       // Path routing (NEXT_PUBLIC_ROUTING=path, e.g. on a *.vercel.app address with no subdomains): the portal, the vendor console and
       // school sites share the root host. Same pages, same session refresh, same database checks — only the address shape differs.
       if (process.env.NEXT_PUBLIC_ROUTING === 'path') {
@@ -40,6 +43,7 @@ export async function middleware(req: NextRequest) {
       // makes Next fall back to a client-side redirect, which goes through the right host. (Middleware cannot tell those internal
       // fetches apart: Next strips the `rsc` header before middleware runs.) Still fails closed — nothing internal is served here.
       return new NextResponse(NOT_FOUND_HTML, { status: 404, headers: { 'content-type': 'text/html; charset=utf-8' } });
+    }
     case 'reserved': {
       // signed-in surfaces refresh the session so server-rendered pages never see an expired token
       if (k.label === 'vendor') return refreshSession(req, rewrite(req, pathname.startsWith('/vendor') ? pathname : `/vendor${pathname === '/' ? '' : pathname}`, search));
@@ -66,4 +70,4 @@ function rewrite(req: NextRequest, path: string, search: string) {
 
 // Static/PWA files are served as-is on every host (never rewritten into /portal, /vendor or /site), and middleware does not even start
 // for them: _next assets, /api, the PWA/robots files, and any path ending in a file extension (images, fonts, .webmanifest, .js …).
-export const config = { matcher: ['/((?!_next/|api/|icons/|manifest.webmanifest|robots.txt|sitemap.xml|.*\\.[A-Za-z0-9]{1,8}$).*)'] };
+export const config = { matcher: ['/((?!_next/|api/|icons/|manifest.webmanifest|robots.txt|sitemap.xml|opengraph-image|.*\\.[A-Za-z0-9]{1,8}$).*)'] };

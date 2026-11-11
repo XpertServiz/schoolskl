@@ -14,6 +14,8 @@ export const metadata: Metadata = {
   description: 'School management for Pakistan — fees, results, attendance and parent messages, in English and Urdu.',
   applicationName: product,
   icons: { apple: '/icons/apple-touch-180.png' },
+  // Google Search Console: set GOOGLE_SITE_VERIFICATION (the content=… value of the HTML-tag method) to prove ownership; absent = no tag
+  verification: process.env.GOOGLE_SITE_VERIFICATION ? { google: process.env.GOOGLE_SITE_VERIFICATION } : undefined,
   appleWebApp: { capable: true, title: product, statusBarStyle: 'black-translucent' },
 };
 
@@ -23,7 +25,7 @@ export const viewport: Viewport = { themeColor: '#23303A', width: 'device-width'
 // DECISION (CPU): the root layout reads NO cookies, so public pages can be static. The page language/direction still follows the
 // `locale` cookie: this runs before first paint and sets <html lang dir>; every surface also wraps its content in <div lang dir>
 // (server-rendered from the same cookie or the URL), so without JavaScript the text is still in the right direction.
-const LOCALE_SCRIPT = `try{var m=document.cookie.match(/(?:^|; )locale=(ur|en)(?:;|$)/),l=m?m[1]:'en',d=document.documentElement;d.lang=l;d.dir=l==='ur'?'rtl':'ltr'}catch(e){}`;
+const LOCALE_SCRIPT = `try{var m=document.cookie.match(/(?:^|; )locale=(ur|en)(?:;|$)/),l=m?m[1]:'en',d=document.documentElement;if(location.pathname==='/ur'||location.pathname.indexOf('/ur/')===0)l='ur';d.lang=l;d.dir=l==='ur'?'rtl':'ltr'}catch(e){}`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

@@ -45,12 +45,12 @@ describe('schema invariants (fail CI when a future migration forgets RLS)', () =
     expect(rows.map((r) => r.proname)).toEqual([]);
   });
 
-  it('anon can read only the public pricing catalogue', async () => {
+  it('anon can read only the public marketing content (pricing plans, landing media, website settings)', async () => {
     const { rows } = await admin<{ table_name: string }>(
       db,
       `select distinct table_name from information_schema.role_table_grants where grantee = 'anon' and table_schema = 'public'`,
     );
-    expect(rows.map((r) => r.table_name).sort()).toEqual(['plan_features', 'plans']);
+    expect(rows.map((r) => r.table_name).sort()).toEqual(['plan_features', 'plans', 'site_media', 'site_settings']);
   });
 
   it('anon can execute resolve_tenant and nothing else in public', async () => {

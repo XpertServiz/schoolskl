@@ -2,8 +2,12 @@ import Link from 'next/link';
 import { formatMoney, money } from '@ilmora/core';
 import { t, type Locale } from '@ilmora/i18n';
 import { asLocale } from '@/lib/locale';
+import { seo } from '@/lib/seo';
 
-export const metadata = { title: 'Pricing' };
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
+  const l = asLocale((await params).lang);
+  return seo(l, '/pricing', t(l, 'marketing.nav.pricing'));
+}
 // the public plan catalogue (anon-readable, no school data) — rebuilt at most once an hour
 export const revalidate = 3600;
 

@@ -103,6 +103,14 @@ await page('PARENT bus page renders', A, '/portal/family/bus', parent, { text: [
 await page('PARENT cannot open the staff live-bus page', A, '/portal/transport/live', parent, { status: 307, loc: '/portal' });
 
 await page('VENDOR add-people page lists the schools', 'vendor.localhost', '/vendor/people', vendor, { text: ['Add people to a school', 'Noor Academy', 'School owner'] });
+// Super-admin control room + SEO
+await page('VENDOR dashboard: platform numbers, schools, quick links', 'vendor.localhost', '/vendor', vendor, { text: ['Platform dashboard', 'Every school', 'Noor Academy', 'Quick links', 'Google Search Console'] });
+await page('VENDOR website content page', 'vendor.localhost', '/vendor/website', vendor, { text: ['Website content', 'Demo video and reels', 'Add video', 'WhatsApp number'] });
+await page('VENDOR visitors page', 'vendor.localhost', '/vendor/visitors', vendor, { text: ['Website visitors', 'Last 7 days', 'Last 30 days'] });
+await page('a school owner cannot open the visitors page', 'vendor.localhost', '/vendor/visitors', owner, { status: 307, loc: '/not-found' });
+await page('sitemap.xml lists the public pages (English + Urdu)', 'localhost', '/sitemap.xml', null, { text: ['/pricing', '/ur/pricing', 'hreflang'] });
+await page('robots.txt names the sitemap and blocks private areas', 'localhost', '/robots.txt', null, { text: ['Sitemap:', 'Disallow: /portal', 'Disallow: /vendor'] });
+await page('Urdu home page has its own address (/ur)', 'localhost', '/ur', null, { text: ['lang="ur"', 'rel="canonical"'] });
 // Logins (invites): users.manage needs 2FA, so the demo owner (no 2FA) gets the explanation, not the form; a teacher is sent away
 await page('ADD PEOPLE page: the owner (no 2FA) can add teachers, drivers, accountants', A, '/portal/people', owner, { text: ['Add people', 'name="email"', 'Teacher', 'Driver', 'Accountant'], absent: ['School owner</option>'] });
 await page('MENU shows Logins to the owner', A, '/portal', owner, { text: ['/portal/people'] });
