@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import { cookies } from 'next/headers';
 import { t, type Locale } from '@ilmora/i18n';
+import { asLocale } from '@/lib/locale';
 import { Icons } from '@/components/landing/icons';
 import { PhoneMock } from '@/components/landing/PhoneMock';
 import { portalLoginUrl } from '@/lib/urls';
@@ -11,8 +11,8 @@ export const metadata = { title: 'Apps' };
  * Where the apps are. Honest status: the web app is usable (and installable) today; the store apps are built and tested but not yet published —
  * no fake download buttons. The web app lives on app.<root domain>.
  */
-export default async function Apps() {
-  const locale: Locale = (await cookies()).get('locale')?.value === 'ur' ? 'ur' : 'en';
+export default async function Apps({ params }: { params: Promise<{ lang: string }> }) {
+  const locale: Locale = asLocale((await params).lang);
   const tr = (k: string, v?: Record<string, string | number>) => t(locale, k, v);
   const webApp = portalLoginUrl();
   return (

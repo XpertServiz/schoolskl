@@ -1,5 +1,5 @@
-import { cookies } from 'next/headers';
 import { t, type Locale } from '@ilmora/i18n';
+import { asLocale } from '@/lib/locale';
 
 export const metadata = { title: 'Privacy and children' };
 
@@ -11,8 +11,8 @@ export const metadata = { title: 'Privacy and children' };
 // (no "can we export our data?" entry until a school-facing export exists — never promise what the product does not do yet)
 const POINTS = ['isolation', 'consent', 'noAds', 'noLabels', 'humans', 'access'] as const;
 
-export default async function Privacy() {
-  const locale: Locale = (await cookies()).get('locale')?.value === 'ur' ? 'ur' : 'en';
+export default async function Privacy({ params }: { params: Promise<{ lang: string }> }) {
+  const locale: Locale = asLocale((await params).lang);
   const tr = (k: string) => t(locale, k);
   return (
     <div className="wrap">

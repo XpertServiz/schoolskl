@@ -1,9 +1,13 @@
 import { notFound } from 'next/navigation';
 import { t } from '@ilmora/i18n';
+import { LocaleRoot } from '@/components/locale-root';
 import { resolveTenant } from '@/lib/tenant';
 import { portalLoginUrl } from '@/lib/urls';
 
-export const dynamic = 'force-dynamic';
+// DECISION (CPU): a school's public page is built on its first visit and served from cache for an hour (ISR), per host — it holds only
+// the public branding that resolve_tenant returns, never a record. An unknown host is cached as a 404 for the same hour.
+export const revalidate = 3600;
+export function generateStaticParams() { return []; }
 
 const text = (v: unknown, max: number): string | null => (typeof v === 'string' && v.trim() ? v.trim().slice(0, max) : null);
 
@@ -19,6 +23,7 @@ export default async function TenantHome({ params }: { params: Promise<{ host: s
   const b = tenant.branding ?? {};
   const tagline = text(b.tagline, 160), about = text(b.about, 1500), phone = text(b.phone, 30), address = text(b.address, 200);
   return (
+    <LocaleRoot locale={tenant.locale}>
     <div className="wrap" lang={tenant.locale} dir={tenant.locale === 'ur' ? 'rtl' : 'ltr'}>
       <h1>{tenant.name}</h1>
       {tagline ? <p className="muted" style={{ fontSize: '1.15rem' }}>{tagline}</p> : null}
@@ -28,5 +33,6 @@ export default async function TenantHome({ params }: { params: Promise<{ host: s
         <p className="muted">{address}{address && phone ? ' · ' : ''}{phone ? <span className="ltr">{phone}</span> : null}</p>
       ) : null}
     </div>
+    </LocaleRoot>
   );
 }

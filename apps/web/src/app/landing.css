@@ -5,7 +5,7 @@
 .l-section { padding-block: clamp(3rem, 8vw, 6rem); }
 .l-section > h2, .l-head { font-family: Sora, Inter, system-ui, sans-serif; font-size: clamp(1.8rem, 4vw, 2.8rem); letter-spacing: -0.025em; line-height: 1.1; margin: 0 0 .6rem; }
 .l-section > h2.c, .l-head.c { text-align: center; margin-bottom: 2rem; }
-html[lang='ur'] .l-section > h2, html[lang='ur'] .l-head { letter-spacing: 0; line-height: 1.6; }
+.lroot[lang='ur'] .l-section > h2, .lroot[lang='ur'] .l-head { letter-spacing: 0; line-height: 1.6; }
 .l-sub { color: var(--ink-2); max-width: 44rem; margin: 0 0 2.25rem; font-size: 1.1rem; }
 .l-sub.c { margin: -1.25rem auto 2.5rem; text-align: center; }
 .apps-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: 3rem; align-items: center; }
@@ -44,7 +44,7 @@ html[lang='ur'] .l-section > h2, html[lang='ur'] .l-head { letter-spacing: 0; li
 .eyebrow::before { content: ''; width: .5rem; height: .5rem; border-radius: 50%; background: #5FD3A0; box-shadow: 0 0 0 4px color-mix(in srgb, #5FD3A0 25%, transparent); animation: pulse 2s ease-in-out infinite; }
 @keyframes pulse { 50% { box-shadow: 0 0 0 8px color-mix(in srgb, #5FD3A0 0%, transparent); } }
 .hero h1 { font-family: Sora, Inter, system-ui, sans-serif; font-size: clamp(2.6rem, 7.5vw, 5.4rem); letter-spacing: -0.035em; line-height: 1.02; margin: 1.1rem auto .9rem; max-width: 15ch; }
-html[lang='ur'] .hero h1 { letter-spacing: 0; line-height: 1.45; max-width: 18ch; }
+.lroot[lang='ur'] .hero h1 { letter-spacing: 0; line-height: 1.45; max-width: 18ch; }
 .hero p.lead { font-size: clamp(1.05rem, 2.2vw, 1.3rem); color: var(--ink-2); max-width: 34rem; margin: 0 auto 1.8rem; }
 .hero-cta { display: flex; gap: .85rem; flex-wrap: wrap; justify-content: center; }
 

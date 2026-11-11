@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
+import { allow, clientIp } from '@/lib/rate-limit';
 import { supabaseServer } from '@/lib/supabase/server';
 
 export interface LoginState {
@@ -15,7 +16,14 @@ export interface LoginState {
  * Sign in with a one-time code sent to the person's email (DECISION: email OTP instead of phone OTP until an SMS
  * provider exists). Needs custom SMTP in Supabase (Auth → SMTP) and `{{ .Token }}` in the Magic Link template.
  */
+// Bots: a filled honeypot gets the normal-looking answer and nothing is sent; more than a few tries a minute from one address are refused
+// before any Auth call (one server call per submit, as before).
+const bot = (form: FormData) => String(form.get('website') ?? '') !== '';
+const limited = async (bucket: string, limit: number) => !allow(bucket, await clientIp(), limit, 60);
+
 export async function sendCode(_: LoginState, form: FormData): Promise<LoginState> {
+  if (bot(form)) return { step: 'email', error: 'auth.err.sendFailed' };
+  if (await limited('otp-send', 5)) return { step: 'email', error: 'auth.err.tooMany' };
   const parsed = z.string().trim().email().safeParse(form.get('email'));
   if (!parsed.success) return { step: 'email', error: 'auth.err.badEmail' };
   const sb = await supabaseServer();
@@ -28,6 +36,7 @@ export async function sendCode(_: LoginState, form: FormData): Promise<LoginStat
 export async function verifyCode(prev: LoginState, form: FormData): Promise<LoginState> {
   const code = z.string().trim().regex(/^\d{6,8}$/).safeParse(form.get('code'));
   if (!code.success || !prev.email) return { ...prev, step: 'code', error: 'auth.err.badCode' };
+  if (await limited('otp-verify', 10)) return { ...prev, step: 'code', error: 'auth.err.tooMany' };
   const sb = await supabaseServer();
   const { error } = await sb.auth.verifyOtp({ email: prev.email, token: code.data, type: 'email' });
   if (error) return { ...prev, step: 'code', error: 'auth.err.wrongCode' };
@@ -35,6 +44,8 @@ export async function verifyCode(prev: LoginState, form: FormData): Promise<Logi
 }
 
 export async function signInWithPassword(_: LoginState, form: FormData): Promise<LoginState> {
+  if (bot(form)) return { step: 'email', error: 'auth.err.wrong' };
+  if (await limited('password', 10)) return { step: 'email', error: 'auth.err.tooMany' };
   const parsed = z.object({ email: z.string().email(), password: z.string().min(1) }).safeParse(Object.fromEntries(form));
   // errors are translation KEYS (the client form shows them in the user's language); one message for every failure: no account enumeration
   if (!parsed.success) return { step: 'email', error: 'auth.err.fields' };

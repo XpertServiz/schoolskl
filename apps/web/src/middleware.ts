@@ -17,7 +17,7 @@ export async function middleware(req: NextRequest) {
   const k = classifyHost(host, root);
 
   // never let a caller reach the internal prefixes directly via the wrong host
-  const internal = pathname.startsWith('/site/') || pathname.startsWith('/vendor') || pathname.startsWith('/portal');
+  const internal = pathname.startsWith('/site/') || pathname.startsWith('/vendor') || pathname.startsWith('/portal') || pathname === '/m' || pathname.startsWith('/m/');
 
   switch (k.kind) {
     case 'root':
@@ -30,7 +30,9 @@ export async function middleware(req: NextRequest) {
         const site = /^\/s\/([a-z0-9][a-z0-9-]{1,61}[a-z0-9])(\/.*)?$/.exec(pathname);
         if (site) return rewrite(req, `/site/${site[1]}${site[2] ?? ''}`, search); // the page resolves the bare slug
       }
-      if (!internal) return NextResponse.next();
+      // DECISION (CPU): public marketing pages are static, one copy per language under /m/<lang>/…; the visitor's cookie picks the copy.
+      // No database or auth call here — a cookie read and a rewrite.
+      if (!internal) return rewrite(req, `/m/${req.cookies.get('locale')?.value === 'ur' ? 'ur' : 'en'}${pathname === '/' ? '' : pathname}`, search);
       // DECISION: internal prefixes on the root host get a small static 404 page, not a rewrite to the rendered /not-found route.
       // When a server action redirects, Next pre-renders the target with an internal fetch to the server's own origin (`next start` →
       // http://localhost:PORT), which loses the app./vendor. host and lands here. If that fetch gets a React Server Component response
@@ -62,5 +64,6 @@ function rewrite(req: NextRequest, path: string, search: string) {
   return NextResponse.rewrite(new URL(`${path}${search}`, req.url));
 }
 
-// Static/PWA files are served as-is on every host (never rewritten into /portal, /vendor or /site).
-export const config = { matcher: ['/((?!_next/|api/|favicon.ico|robots.txt|sitemap.xml|manifest.webmanifest|sw.js|offline.html|icon.png|icons/).*)'] };
+// Static/PWA files are served as-is on every host (never rewritten into /portal, /vendor or /site), and middleware does not even start
+// for them: _next assets, /api, the PWA/robots files, and any path ending in a file extension (images, fonts, .webmanifest, .js …).
+export const config = { matcher: ['/((?!_next/|api/|icons/|manifest.webmanifest|robots.txt|sitemap.xml|.*\\.[A-Za-z0-9]{1,8}$).*)'] };

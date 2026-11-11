@@ -1,18 +1,23 @@
-import { cookies } from 'next/headers';
+import { Suspense } from 'react';
 import { t, type Locale } from '@ilmora/i18n';
+import { asLocale } from '@/lib/locale';
+import { DemoFlash } from './flash';
 
 export const metadata = { title: 'Book a demo' };
 
-/** Plain HTML form → /api/demo (no client JS needed, works on the weakest phone). The hidden "website" field is a honeypot for bots. */
-export default async function Demo({ searchParams }: { searchParams: Promise<{ sent?: string; err?: string }> }) {
-  const locale: Locale = (await cookies()).get('locale')?.value === 'ur' ? 'ur' : 'en';
+/**
+ * Plain HTML form → /api/demo (no client JS needed, works on the weakest phone). The hidden "website" field is a honeypot for bots.
+ * The page itself is static per language; the "sent / error" message after a submit is read from the URL in the browser (DemoFlash).
+ */
+export default async function Demo({ params }: { params: Promise<{ lang: string }> }) {
+  const locale: Locale = asLocale((await params).lang);
   const tr = (k: string) => t(locale, k);
-  const sp = await searchParams;
   return (
     <div className="wrap">
       <h1>{tr('marketing.demo.title')}</h1>
-      {sp.sent ? <p role="status" className="flash ok">{tr('marketing.demo.thanks')}</p> : null}
-      {sp.err ? <p role="alert" className="flash err">{tr(`marketing.demo.err.${sp.err === 'phone' ? 'phone' : sp.err === 'fields' ? 'fields' : 'failed'}`)}</p> : null}
+      <Suspense fallback={null}>
+        <DemoFlash thanks={tr('marketing.demo.thanks')} errors={{ phone: tr('marketing.demo.err.phone'), fields: tr('marketing.demo.err.fields'), failed: tr('marketing.demo.err.failed') }} />
+      </Suspense>
       <form method="post" action="/api/demo" className="form card">
         <label>{tr('marketing.demo.name')}<input name="name" required minLength={2} maxLength={120} autoComplete="name" /></label>
         <label>{tr('marketing.demo.school')}<input name="school" required minLength={2} maxLength={160} autoComplete="organization" /></label>

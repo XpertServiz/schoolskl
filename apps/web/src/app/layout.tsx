@@ -1,9 +1,8 @@
 import type { Metadata, Viewport } from 'next';
 import { Suspense } from 'react';
+import { t } from '@ilmora/i18n';
 import { NavLoader } from '@/components/nav-loader';
 import { RegisterSW } from '@/components/register-sw';
-import { cookies } from 'next/headers';
-import { dirOf, t, type Locale } from '@ilmora/i18n';
 import './globals.css';
 
 // DECISION: the product name is never hard-coded (CLAUDE.md header). It comes from NEXT_PUBLIC_PRODUCT_NAME until
@@ -21,15 +20,18 @@ export const metadata: Metadata = {
 // the browser chrome / splash colour follows the Slate background
 export const viewport: Viewport = { themeColor: '#23303A', width: 'device-width', initialScale: 1 };
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const c = (await cookies()).get('locale')?.value;
-  const locale: Locale = c === 'ur' ? 'ur' : 'en';
+// DECISION (CPU): the root layout reads NO cookies, so public pages can be static. The page language/direction still follows the
+// `locale` cookie: this runs before first paint and sets <html lang dir>; every surface also wraps its content in <div lang dir>
+// (server-rendered from the same cookie or the URL), so without JavaScript the text is still in the right direction.
+const LOCALE_SCRIPT = `try{var m=document.cookie.match(/(?:^|; )locale=(ur|en)(?:;|$)/),l=m?m[1]:'en',d=document.documentElement;d.lang=l;d.dir=l==='ur'?'rtl':'ltr'}catch(e){}`;
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang={locale} dir={dirOf(locale)}>
+    <html lang="en" dir="ltr" suppressHydrationWarning>
+      <head><script dangerouslySetInnerHTML={{ __html: LOCALE_SCRIPT }} /></head>
       <body>
-        <a className="skip" href="#main">{t(locale, 'common.skip')}</a>
         <main id="main">{children}</main>
-        <Suspense fallback={null}><NavLoader label={t(locale, 'app.loading')} /></Suspense>
+        <Suspense fallback={null}><NavLoader label={`${t('en', 'app.loading')} / ${t('ur', 'app.loading')}`} /></Suspense>
         <RegisterSW />
       </body>
     </html>

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { pkMobileSchema } from '@ilmora/validation';
+import { allow, clientIp } from '@/lib/rate-limit';
 import { supabaseService } from '@/lib/supabase/service';
 
 export const dynamic = 'force-dynamic';
@@ -23,6 +24,7 @@ export async function POST(req: Request) {
   const form = await req.formData();
 
   if (String(form.get('website') ?? '') !== '') return back('sent=1'); // honeypot filled: look successful, store nothing
+  if (!allow('demo', await clientIp(), 5, 600)) return back('err=failed'); // more than 5 requests in 10 minutes from one address
 
   const phone = pkMobileSchema.safeParse(form.get('phone'));
   if (!phone.success) return back('err=phone');

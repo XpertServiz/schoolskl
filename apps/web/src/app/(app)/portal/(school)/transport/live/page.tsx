@@ -1,11 +1,12 @@
 import Link from 'next/link';
+import { AutoRefresh } from '@/components/auto-refresh';
 import { BusMap, ageText } from '@/components/bus-map';
 import { need, portal } from '@/lib/portal';
 
 export const metadata = { title: 'Live buses', robots: { index: false, follow: false } };
 export const dynamic = 'force-dynamic';
 
-/** Every bus on a trip right now, refreshed every 15 s without client JS. Bus positions only (tracking.live.view). */
+/** Every bus on a trip right now, refreshed every 60 s while a bus is out and the tab is visible. Bus positions only (tracking.live.view). */
 export default async function LiveBuses() {
   const p = await portal();
   need(p, 'tracking.live.view');
@@ -14,7 +15,7 @@ export default async function LiveBuses() {
   const trips = (data ?? []) as Live[];
   return (
     <>
-      <meta httpEquiv="refresh" content="15" />
+      {trips.length ? <AutoRefresh seconds={60} /> : null}
       <p className="inline"><Link href="/portal/transport">← {p.tr('ui.back')}</Link></p>
       <h1>{p.tr('transport.live')}</h1>
       <p className="muted">{p.tr('transport.family.refresh')}</p>

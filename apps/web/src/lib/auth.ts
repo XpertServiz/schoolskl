@@ -1,12 +1,14 @@
 import { redirect } from 'next/navigation';
+import { cache } from 'react';
 import { supabaseServer } from './supabase/server';
 
 /** The verified user (getUser() round-trips to Auth — never trust getSession() cookies on the server). */
-export async function currentUser() {
+// memoised for the current request only (see lib/portal.ts): one Auth round-trip per page view, never shared across requests
+export const currentUser = cache(async () => {
   const sb = await supabaseServer();
   const { data } = await sb.auth.getUser();
   return data.user ?? null;
-}
+});
 
 export async function requireUser() {
   const user = await currentUser();

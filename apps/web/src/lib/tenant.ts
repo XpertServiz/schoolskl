@@ -24,7 +24,7 @@ export async function resolveTenant(host: string): Promise<ResolvedTenant | null
       method: 'POST',
       headers: { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ p_host: host.replace(/:\d+$/, '').toLowerCase() }),
-      next: { revalidate: 60 },
+      next: { revalidate: 3600 }, // cached per host (the body is part of the key); public branding only
     });
     if (!res.ok) return null;
     const rows = (await res.json()) as ResolvedTenant[];

@@ -1,10 +1,11 @@
 import Link from 'next/link';
-import { cookies } from 'next/headers';
 import { formatMoney, money } from '@ilmora/core';
 import { t, type Locale } from '@ilmora/i18n';
+import { asLocale } from '@/lib/locale';
 
 export const metadata = { title: 'Pricing' };
-export const revalidate = 300;
+// the public plan catalogue (anon-readable, no school data) — rebuilt at most once an hour
+export const revalidate = 3600;
 
 interface Plan { key: string; name: string; price_minor: number | null; currency: string; limits: Record<string, number | null>; sort_order: number }
 
@@ -15,8 +16,8 @@ async function catalogue(): Promise<{ plans: Plan[]; features: Record<string, Se
   try {
     const h = { apikey: key, Authorization: `Bearer ${key}` };
     const [p, f] = await Promise.all([
-      fetch(`${url}/rest/v1/plans?select=id,key,name,price_minor,currency,limits,sort_order&order=sort_order`, { headers: h, next: { revalidate: 300 } }),
-      fetch(`${url}/rest/v1/plan_features?select=plan_id,feature_key,enabled&enabled=eq.true`, { headers: h, next: { revalidate: 300 } }),
+      fetch(`${url}/rest/v1/plans?select=id,key,name,price_minor,currency,limits,sort_order&order=sort_order`, { headers: h, next: { revalidate: 3600 } }),
+      fetch(`${url}/rest/v1/plan_features?select=plan_id,feature_key,enabled&enabled=eq.true`, { headers: h, next: { revalidate: 3600 } }),
     ]);
     if (!p.ok || !f.ok) return null;
     const plans = (await p.json()) as (Plan & { id: string })[];
@@ -29,8 +30,8 @@ async function catalogue(): Promise<{ plans: Plan[]; features: Record<string, Se
 
 const ALL = ['double_entry_accounting', 'payroll', 'exams_kit', 'admissions_crm', 'custom_domain', 'api'] as const;
 
-export default async function Pricing() {
-  const locale: Locale = (await cookies()).get('locale')?.value === 'ur' ? 'ur' : 'en';
+export default async function Pricing({ params }: { params: Promise<{ lang: string }> }) {
+  const locale: Locale = asLocale((await params).lang);
   const tr = (k: string, v?: Record<string, string | number>) => t(locale, k, v);
   const data = await catalogue();
   return (

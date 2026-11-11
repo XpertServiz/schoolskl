@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import { cache } from 'react';
 import { redirect } from 'next/navigation';
 import { formatMoney, money } from '@ilmora/core';
 import { t, type Locale } from '@ilmora/i18n';
@@ -24,7 +25,11 @@ export async function getLocale(): Promise<Locale> {
  * Everything a school page needs, resolved once per request. The menu and buttons are driven by `can()`/`has()`, but they are only a
  * convenience: every RPC and every RLS policy re-checks the same rules in the database, so hiding a button is never the security boundary.
  */
-export async function portal() {
+// DECISION (CPU): memoised per request with React cache() — the school layout and the page both call portal(), which used to mean two
+// Auth round-trips and two my_access calls per page view. cache() lives for ONE server request only (one user, one cookie), so nothing
+// is ever shared between people, schools or roles; every RPC and RLS policy still checks the caller as before.
+export const portal = cache(portalUncached);
+async function portalUncached() {
   const user = await requireUser();
   const sb = await supabaseServer();
   // a failed call (network blip) is not "no school": retry once, and if it still fails show the error page rather than the school picker

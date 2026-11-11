@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import { cookies } from 'next/headers';
 import { t, type Locale } from '@ilmora/i18n';
+import { asLocale } from '@/lib/locale';
 import Campus3DLazy from '@/components/landing/Campus3DLazy';
 import { Icons } from '@/components/landing/icons';
 import { PhoneMock } from '@/components/landing/PhoneMock';
@@ -13,8 +13,8 @@ const TILES = [
   ['ledger', Icons.ledger, ''], ['people', Icons.users, ''], ['urdu', Icons.language, ''], ['offline', Icons.offline, ''],
 ] as const;
 
-export default async function Home() {
-  const locale: Locale = (await cookies()).get('locale')?.value === 'ur' ? 'ur' : 'en';
+export default async function Home({ params }: { params: Promise<{ lang: string }> }) {
+  const locale: Locale = asLocale((await params).lang);
   const tr = (k: string, v?: Record<string, string | number>) => t(locale, k, v);
   const moment = (cls: string, icon: React.ReactNode, b: string, s: string) => (
     <div className={`moment ${cls}`} aria-hidden="true"><span className="ic">{icon}</span><span><b>{tr(b)}</b><small>{tr(s)}</small></span></div>
