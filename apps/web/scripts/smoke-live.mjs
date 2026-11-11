@@ -48,7 +48,7 @@ const parent = await cookieFor('parent@noor-academy.test');
 const teacher = await cookieFor('teacher@noor-academy.test');
 const owner = await cookieFor('owner@noor-academy.test');
 
-await page('login page renders both sign-in methods', 'app.localhost', '/portal/login', null, { text: ['Mobile number', 'Send code', 'Email', 'name="password"', 'auth-shell'] });
+await page('login page renders both sign-in methods', 'app.localhost', '/portal/login', null, { text: ['Send code', 'Email', 'name="email"', 'name="password"', 'auth-shell', 'Forgot your password'], absent: ['Mobile number'] });
 await page('signed-out visitor to /portal/schools is sent to login', 'app.localhost', '/portal/schools', null, { status: 307, loc: '/portal/login' });
 await page('vendor console renders tenants list', 'vendor.localhost', '/vendor/tenants', vendor, { text: ['Noor Academy', 'City Grammar School', 'Crescent'] });
 await page('vendor plans page lists the 4 plans', 'vendor.localhost', '/vendor/plans', vendor, { text: ['Starter', 'Growth', 'Chain', 'Enterprise', 'Contact us'] });
@@ -73,6 +73,12 @@ await page('ADMISSIONS shows both inquiries', A, '/portal/admissions', owner, { 
 await page('PARENT sees only their own children', A, '/portal/family', parent, { text: ['Amna Khan', 'Bilal Khan'], absent: ['Zara Ahmed', 'Daniyal Chaudhry'] });
 await page('PARENT is not shown staff menus', A, '/portal/family', parent, { text: ['My family'], absent: ['Fee setup', 'Payroll', 'Bank matching'] });
 await page('PARENT sent away from the accounts page', A, '/portal/accounts', parent, { status: 307, loc: '/portal' });
+await page('MENU is grouped for the owner', A, '/portal', owner, { text: ['class="navgroup"', 'People', 'Money', 'Academics', 'Staff', 'Timetable'] });
+await page('STAFF page: list, staff attendance and add form', A, '/portal/staff', owner, { text: ['Staff list', 'Staff attendance', 'Add staff member'] });
+await page('TIMETABLE page: subjects, bell periods, class picker', A, '/portal/timetable', owner, { text: ['Timetable', 'Subjects', 'Bell periods', 'Add period'] });
+await page('SECURITY page offers a password change', A, '/portal/security', owner, { text: ['Change password', 'name="again"'] });
+await page('PARENT does not get staff or timetable', A, '/portal/timetable', parent, { status: 307, loc: '/portal' });
+await page('TEACHER can view the timetable but not edit it', A, '/portal/timetable', teacher, { text: ['Timetable'], absent: ['Add period', 'Add subject'] });
 await page('TEACHER gets the attendance page', A, '/portal/attendance', teacher, { text: ['Attendance'] });
 await page('TEACHER sees no fee setup', A, '/portal/fees/setup', teacher, { status: 307, loc: '/portal' });
 await page('marketing home', 'localhost', '/', null, { text: ['Your school, running itself.'] });

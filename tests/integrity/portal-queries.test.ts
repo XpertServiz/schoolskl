@@ -49,6 +49,18 @@ const PAGE_QUERIES: Record<string, string> = {
   'accounts:bs': `select section, code, name, amount from public.balance_sheet('2026-12-31')`,
   'accounts:close': `select public.daily_closing_report(current_date)`,
   vendorless: `select tenant_id from public.my_tenants()`,
+  staff: `select id, employee_no, full_name, designation, status, shift_start, shift_end, user_id from public.staff_members order by employee_no`,
+  'staff:mine': `select id, full_name, status from public.staff_members where user_id = auth.uid()`,
+  'staff:att': `select staff_id, status, check_in, check_out from public.staff_attendance`,
+  'staff:members': `select user_id from public.user_tenants where status = 'active'`,
+  'staff:profiles': `select user_id, full_name from public.profiles`,
+  'staff:campuses': `select id, name from public.campuses where is_active`,
+  'timetable:subjects': `select id, code, name from public.subjects where is_active order by name`,
+  'timetable:periods': `select id, campus_id, name, starts_at, ends_at, sort_order, is_break from public.periods order by sort_order, starts_at`,
+  'timetable:classes': `select id, name, level, campus_id from public.classes order by level`,
+  'timetable:sections': `select id, class_id, name from public.sections order by name`,
+  'timetable:staff': `select id, full_name from public.staff_members where status = 'active' order by full_name`,
+  'timetable:slots': `select id, day_of_week, period_id, subject_id, teacher_id from public.timetable_slots`,
 };
 
 beforeAll(async () => {
@@ -109,6 +121,53 @@ describe('what each role can read for its own screens', () => {
         if (name === 'students') expect(theirIds.has(row.id), name).toBe(false);
       }
     }
+  });
+});
+
+describe('staff and timetable screens (the writes the pages make, as the roles that make them)', () => {
+  it('the owner adds staff, marks a staff day, and a parent sees no staff data at all', async () => {
+    const a = (await q<{ id: string }>(db, s.owner, `insert into public.staff_members (tenant_id, employee_no, full_name, designation, shift_start, shift_end) values ($1,'E-001','Sana Tariq','Teacher','08:00','14:00') returning id`, [s.tenant])).rows[0]!.id;
+    const b = (await q<{ id: string }>(db, s.owner, `insert into public.staff_members (tenant_id, employee_no, full_name, shift_start, shift_end) values ($1,'E-002','Usman Ali','08:00','14:00') returning id`, [s.tenant])).rows[0]!.id;
+    expect((await q(db, s.owner, PAGE_QUERIES.staff!)).rows.length).toBeGreaterThanOrEqual(2);
+    await q(db, s.owner, `select public.mark_staff_attendance($1::date, $2::jsonb)`, [s.today, JSON.stringify([{ staff_id: a, status: 'present' }, { staff_id: b, status: 'half_day' }])]);
+    const att = (await q<{ status: string }>(db, s.owner, `${PAGE_QUERIES['staff:att']} where att_date = $1 order by status`, [s.today])).rows.map((r) => r.status);
+    expect(att).toEqual(['half_day', 'present']);
+    // the status form: resign one person
+    await q(db, s.owner, `update public.staff_members set status = 'resigned', left_on = $2 where id = $1`, [b, s.today]);
+    // a parent: no staff list, no staff attendance, no other members' profiles
+    expect((await q(db, s.parent, PAGE_QUERIES.staff!)).rows).toEqual([]);
+    expect((await q(db, s.parent, PAGE_QUERIES['staff:att']!)).rows).toEqual([]);
+    await expect(q(db, s.cashier, `insert into public.staff_members (tenant_id, employee_no, full_name) values ($1,'E-9','X')`, [s.tenant])).rejects.toThrow();
+  });
+
+  it('timetable: set a lesson, replace the same cell by UPDATE (not upsert), and a teacher double-booking is refused', async () => {
+    const subj = (await q<{ id: string }>(db, s.owner, `insert into public.subjects (tenant_id, code, name) values ($1,'MATH','Mathematics') returning id`, [s.tenant])).rows[0]!.id;
+    const subj2 = (await q<{ id: string }>(db, s.owner, `insert into public.subjects (tenant_id, code, name) values ($1,'URD','Urdu') returning id`, [s.tenant])).rows[0]!.id;
+    const p1 = (await q<{ id: string }>(db, s.owner, `insert into public.periods (tenant_id, campus_id, name, starts_at, ends_at, sort_order) values ($1,$2,'1','08:00','08:40',1) returning id`, [s.tenant, s.campus])).rows[0]!.id;
+    const brk = (await q<{ id: string }>(db, s.owner, `insert into public.periods (tenant_id, campus_id, name, starts_at, ends_at, sort_order, is_break) values ($1,$2,'Break','10:00','10:20',3,true) returning id`, [s.tenant, s.campus])).rows[0]!.id;
+    const teacher = (await q<{ id: string }>(db, s.owner, `select id from public.staff_members where employee_no = 'E-001'`)).rows[0]!.id;
+    const sectionB = (await q<{ id: string }>(db, s.owner, `insert into public.sections (tenant_id, class_id, name) values ($1,$2,'B') returning id`, [s.tenant, s.classId])).rows[0]!.id;
+
+    const slot = (await q<{ id: string }>(db, s.owner, `insert into public.timetable_slots (tenant_id, section_id, day_of_week, period_id, subject_id, teacher_id) values ($1,$2,1,$3,$4,$5) returning id`, [s.tenant, s.section, p1, subj, teacher])).rows[0]!.id;
+    // the page replaces a cell with UPDATE — the clash trigger skips the row itself
+    await q(db, s.owner, `update public.timetable_slots set subject_id = $2 where id = $1`, [slot, subj2]);
+    // an upsert would trip the BEFORE INSERT clash check against the very row it replaces (why the page does not use it)
+    await expect(q(db, s.owner, `insert into public.timetable_slots (tenant_id, section_id, day_of_week, period_id, subject_id) values ($1,$2,1,$3,$4) on conflict (tenant_id, section_id, day_of_week, period_id) do update set subject_id = excluded.subject_id`, [s.tenant, s.section, p1, subj])).rejects.toThrow(/overlaps/);
+    // same teacher, same time, other section → refused
+    await expect(q(db, s.owner, `insert into public.timetable_slots (tenant_id, section_id, day_of_week, period_id, subject_id, teacher_id) values ($1,$2,1,$3,$4,$5)`, [s.tenant, sectionB, p1, subj, teacher])).rejects.toThrow(/teacher is already teaching/);
+    // a lesson in a break → refused
+    await expect(q(db, s.owner, `insert into public.timetable_slots (tenant_id, section_id, day_of_week, period_id, subject_id) values ($1,$2,2,$3,$4)`, [s.tenant, s.section, brk, subj])).rejects.toThrow(/break/);
+
+    // a teacher can READ the timetable screens but cannot change them
+    const t = w.as(ids.teacherA, w.tenantA);
+    for (const k of ['timetable:subjects', 'timetable:periods', 'timetable:classes', 'timetable:sections', 'timetable:slots'] as const) {
+      expect((await q(db, t, PAGE_QUERIES[k]!)).rows.length, k).toBeGreaterThan(0);
+    }
+    await expect(q(db, t, `delete from public.timetable_slots where id = $1 returning id`, [slot])).resolves.toMatchObject({ rows: [] });
+    expect((await q(db, s.owner, `select id from public.timetable_slots where id = $1`, [slot])).rows.length).toBe(1);
+    // and the owner can remove it
+    await q(db, s.owner, `delete from public.timetable_slots where id = $1`, [slot]);
+    expect((await q(db, s.owner, PAGE_QUERIES['timetable:slots']!)).rows).toEqual([]);
   });
 });
 

@@ -20,6 +20,7 @@ export default async function Login() {
         </header>
         <EmailCodeLogin labels={{ email: tr('auth.email'), sendOtp: tr('auth.sendOtp'), code: tr('auth.emailCode'), verify: tr('auth.verify'), sent: tr('auth.emailCodeSent'), errors: { 'auth.err.badEmail': tr('auth.err.badEmail'), 'auth.err.sendFailed': tr('auth.err.sendFailed'), 'auth.err.badCode': tr('auth.err.badCode'), 'auth.err.wrongCode': tr('auth.err.wrongCode') } }} />
         <p className="auth-sep">{tr('auth.or')}</p>
+        <p className="muted" style={{ margin: 0, fontSize: '.9rem' }}>{tr('password.forgot')}</p>
         <PasswordLogin labels={{ email: tr('auth.email'), password: tr('auth.password'), signIn: tr('auth.signIn'), errors: { 'auth.err.fields': tr('auth.err.fields'), 'auth.err.wrong': tr('auth.err.wrong') } }} />
       </div>
     </div>

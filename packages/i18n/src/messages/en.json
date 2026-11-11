@@ -14,7 +14,7 @@
     "resultsPublished": "{school}: {student}'s {exam} results are now available.",
     "resultsAmended": "{school}: a correction was made to {student}'s {exam} results."
   },
-  "nav": { "cockpit": "Cockpit", "students": "Students", "fees": "Fees", "accounts": "Accounts", "settings": "Settings", "auditLog": "Audit log", "approvals": "Approvals", "attendance": "Attendance", "exams": "Exams", "payroll": "Payroll", "admissions": "Admissions", "myFamily": "My family", "signOut": "Sign out", "switchSchool": "Switch school", "language": "اردو" },
+  "nav": { "cockpit": "Cockpit", "students": "Students", "fees": "Fees", "accounts": "Accounts", "settings": "Settings", "auditLog": "Audit log", "approvals": "Approvals", "attendance": "Attendance", "exams": "Exams", "payroll": "Payroll", "admissions": "Admissions", "myFamily": "My family", "staff": "Staff", "timetable": "Timetable", "group": { "people": "People", "money": "Money", "academics": "Academics" }, "signOut": "Sign out", "switchSchool": "Switch school", "language": "اردو" },
   "ui": {
     "readOnly": "This school's account is read-only right now.",
     "noAccess": "You don't have access to this page.",
@@ -77,6 +77,22 @@
       "income": "Income", "expense": "Expenses", "surplus": "Surplus", "assets": "Assets", "liabilities": "Liabilities", "equity": "Equity"
     },
     "payslips": { "title": "My payslips", "basic": "Basic pay" }
+  },
+  "staff": {
+    "title": "Staff", "list": "Staff list", "add": "Add staff member", "added": "Staff member added.", "employeeNo": "Employee no.", "designation": "Designation", "shift": "Shift", "shiftStart": "Shift starts", "shiftEnd": "Shift ends", "joinedOn": "Joined on", "login": "Their login (optional)", "noLogin": "— no login —", "change": "Change",
+    "statuses": { "active": "Active", "on_leave": "On leave", "resigned": "Resigned", "terminated": "Terminated" },
+    "att": { "title": "Staff attendance", "date": "Date", "save": "Save staff attendance", "saved": "Staff attendance saved.", "show": "Show", "statuses": { "present": "Present", "absent": "Absent", "late": "Late", "half_day": "Half day", "leave": "On leave" } },
+    "me": { "title": "My attendance today", "checkIn": "Check in", "checkOut": "Check out", "in": "Checked in at {time}", "out": "Checked out at {time}", "none": "You have not checked in today.", "done": "Done." }
+  },
+  "timetable": {
+    "title": "Timetable", "subjects": "Subjects", "addSubject": "Add subject", "code": "Code", "periods": "Bell periods", "addPeriod": "Add period", "starts": "Starts", "ends": "Ends", "order": "Order", "isBreak": "This is a break",
+    "grid": "Weekly timetable", "pickSection": "Class and section", "show": "Show", "setLesson": "Set a lesson", "day": "Day", "period": "Period", "subject": "Subject", "teacher": "Teacher", "noTeacher": "— none —", "remove": "Remove",
+    "needSetup": "Add subjects and bell periods first.", "breakCell": "Break", "clashHint": "The system refuses a lesson that overlaps another lesson of the same section or the same teacher.",
+    "days": { "1": "Mon", "2": "Tue", "3": "Wed", "4": "Thu", "5": "Fri", "6": "Sat", "7": "Sun" }
+  },
+  "password": {
+    "title": "Change password", "why": "Forgot your password? Sign in with an email code, then set a new one here.", "new": "New password", "confirm": "Repeat new password", "save": "Save password", "saved": "Password changed.", "forgot": "Forgot your password? Sign in with the email code above, then change it under Security.",
+    "err": { "short": "Use at least 10 characters.", "mismatch": "The two passwords do not match.", "failed": "We could not change the password. Sign in again and retry." }
   },
   "mobile": {
     "tab": { "home": "Home", "more": "More" },

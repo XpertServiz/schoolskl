@@ -123,6 +123,15 @@ tests/rls-leak      structure + cross-tenant leak + access-control suites (run o
 - Verified locally: schema validation of both workflows, lockfile consistency, the CI bundle command, `expo prebuild` output. **Not verified until a real run**: the Gradle build, iOS build and EAS.
 - `expo-system-ui` added (dark `userInterfaceStyle` needs it). `apps/mobile` is deliberately not a root workspace; CI installs it separately with `npm ci --legacy-peer-deps`.
 
+### Email-code login, APK, staff/timetable screens (308 tests; 35 live page checks)
+- **Sign-in = email one-time code** (web + mobile) or email+password; phone OTP removed from the UI until an SMS provider exists. Supabase sends via custom SMTP (Resend, `no-reply@visafeast.com`, set in the dashboard — no Resend key lives in the repo or on Vercel). **Supabase sends 8-digit codes**: the forms accept 6–8 digits. The Magic Link template must contain `{{ .Token }}`.
+- **Forgot password** (DECISION): no reset-link template — sign in with an email code, then `/portal/security` → Change password (`updateUser`; hidden until a 2FA user has stepped up).
+- `/portal/staff`: staff register (add, status), HR day-marking via `mark_staff_attendance`, self check-in/out for a staff member linked to a login. `/portal/timetable`: subjects, bell periods, weekly grid per section (Mon–Sat). **A cell is replaced by UPDATE, never upsert** — the clash trigger is BEFORE INSERT, so an upsert clashes with the row it would replace (pinned in `portal-queries.test.ts`).
+- Owner menu grouped (People / Money / Academics, `<details>` dropdowns, no JS).
+- Android APK built by `mobile-build.yml` on GitHub (first real Gradle run: green). Repo secrets `EXPO_PUBLIC_SUPABASE_URL/ANON_KEY` are set.
+- Tester handouts (EN + 2× UR PDFs with demo logins) are generated into `handouts.local/` — gitignored and vercelignored because they contain passwords.
+- `vitest` capped at 4 workers: one PGlite per CPU ran a 12-core machine out of memory.
+
 ### Phases 4–7: mostly not started
 Phase 4 **done**: marketing site, lead capture. **Not done**: Pop-Up Campus 3D, tenant site *builder* (block editor, custom-domain verification UI). SafeRoute (Phase 5; child-phone tracking blocked on a written legal opinion — now also blocked in the database), Learning Compass + AI (Phase 6), chain/hostel/canteen/health/library/inventory/compliance/API/white-label (Phase 7).
 **Cross-cutting still missing**: remaining Phase 2–3 screens (fee-structure setup, concession requests, instalments, reconciliation, accounts/reports, staff/timetable, payslips), the mobile apps, offline teacher app, Playwright e2e, school-facing data export, live Supabase verification, real WhatsApp/SMS adapters, provider-specific webhook formats.

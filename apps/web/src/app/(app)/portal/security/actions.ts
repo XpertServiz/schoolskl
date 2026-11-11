@@ -49,6 +49,22 @@ export async function stepUp(_: CodeState, form: FormData): Promise<CodeState> {
   redirect(safeNext(String(form.get('next') ?? '')));
 }
 
+/**
+ * Set a new password for the signed-in user. Together with the emailed sign-in code this is the "forgot password" flow
+ * (DECISION: no separate reset-link template — a person who forgot it signs in with a code, then changes it here).
+ * Results travel as ?pw=ok / ?pwerr=<key>; the page maps keys to the user's language.
+ */
+export async function changePassword(form: FormData): Promise<void> {
+  const pw = String(form.get('password') ?? '');
+  const again = String(form.get('again') ?? '');
+  if (pw.length < 10 || pw.length > 72) redirect('/portal/security?pwerr=short');
+  if (pw !== again) redirect('/portal/security?pwerr=mismatch');
+  const sb = await supabaseServer();
+  const { error } = await sb.auth.updateUser({ password: pw });
+  if (error) redirect('/portal/security?pwerr=failed');
+  redirect('/portal/security?pw=ok');
+}
+
 /** Only same-site /portal paths: never an open redirect. */
 function safeNext(n: string): string {
   return /^\/portal(\/[A-Za-z0-9\-_/]*)?$/.test(n) ? n : '/portal';
