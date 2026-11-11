@@ -32,7 +32,7 @@ export default async function Demo({ params }: { params: Promise<{ lang: string 
           <select name="size"><option value="">—</option><option value="lt300">&lt; 300</option><option value="300_1000">300 – 1,000</option><option value="1000_3000">1,000 – 3,000</option><option value="gt3000">3,000+</option></select>
         </label>
         <label>{tr('marketing.demo.message')}<textarea name="message" maxLength={1000} rows={3} /></label>
-        <div aria-hidden="true" style={{ position: 'absolute', insetInlineStart: '-9999px' }}><label>Website<input name="website" tabIndex={-1} autoComplete="off" /></label></div>
+        <div aria-hidden="true" style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clipPath: 'inset(50%)', opacity: 0, pointerEvents: 'none' }}><label>Website<input name="website" tabIndex={-1} autoComplete="off" /></label></div>
         <input type="hidden" name="locale" value={locale} />
         <button className="btn">{tr('marketing.demo.send')}</button>
       </form>

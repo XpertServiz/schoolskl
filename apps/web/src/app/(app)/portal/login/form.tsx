@@ -5,7 +5,7 @@ import { sendCode, signInWithPassword, verifyCode, type LoginState } from './act
 
 /** Invisible to people (off-screen, not focusable, hidden from screen readers); bots that fill every field give themselves away. */
 const Honeypot = () => (
-  <div aria-hidden="true" style={{ position: 'absolute', insetInlineStart: '-9999px' }}><label>Website<input name="website" tabIndex={-1} autoComplete="off" /></label></div>
+  <div aria-hidden="true" style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clipPath: 'inset(50%)', opacity: 0, pointerEvents: 'none' }}><label>Website<input name="website" tabIndex={-1} autoComplete="off" /></label></div>
 );
 
 /** Email + password sign-in (staff, vendor, and development). Error keys from the server action are mapped to the user's language here. */
