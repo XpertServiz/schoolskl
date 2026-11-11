@@ -1,0 +1,69 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# a newer push to the same branch/PR cancels the older run
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: tests + web build
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # Migrations are applied to an in-memory Postgres (PGlite): RLS leak tests, ledger/fee integrity, attendance, unit tests,
+      # the i18n parity + "every translation key used in code exists in EN and UR" checks.
+      # A table without RLS, a journal that doesn't balance, or a cross-tenant read fails this job.
+      - run: npm test
+      - run: npm run typecheck
+      - name: Type-check the web app
+        run: npx tsc --noEmit -p apps/web
+      - name: Build web (root domain is inlined into the middleware at build time)
+        run: npm run build:web
+        env:
+          NEXT_PUBLIC_ROOT_DOMAIN: ilmora.pk
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co # build only; real values are set where the app is hosted
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
+
+  mobile:
+    name: mobile app checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            apps/mobile/package-lock.json
+      # the app consumes the shared packages (@ilmora/core, i18n, offline) by file: path, so install the root first
+      - run: npm ci
+      - name: Install the mobile app (it has its own lockfile and is deliberately not a root workspace)
+        working-directory: apps/mobile
+        run: npm ci --legacy-peer-deps
+      - name: Type-check
+        working-directory: apps/mobile
+        run: npx tsc --noEmit
+      - name: Bundle for Android and web (proves Metro resolves every import and the shared packages)
+        working-directory: apps/mobile
+        run: npx expo export --platform android --platform web --output-dir dist
+        env:
+          EXPO_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co # compile-time check only
+          EXPO_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
+          CI: "1"

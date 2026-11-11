@@ -1,0 +1,35 @@
+# Local Supabase (supabase start). Run from packages/db:  npx supabase start && npx supabase db reset
+project_id = "ilmora"
+
+[api]
+port = 54321
+schemas = ["public"]            # `app` stays unexposed: internal helpers are never reachable over the API
+extra_search_path = ["public"]
+
+[db]
+port = 54322
+major_version = 15
+
+[db.seed]
+enabled = true
+sql_paths = ["./seed.sql"]
+
+[auth]
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["http://localhost:3000/**"]
+jwt_expiry = 3600
+enable_signup = false           # schools are created by the vendor; parents/staff are invited, never self-registered
+minimum_password_length = 10
+
+[auth.sms]
+enable_signup = false
+enable_confirmations = true     # phone OTP for parents; configure the SMS/WhatsApp provider before go-live
+
+[auth.mfa.totp]
+enroll_enabled = true
+verify_enabled = true           # money/admin permissions require an aal2 session (see permissions.requires_mfa)
+
+# Stamps tenant_id into the JWT. The database re-verifies membership on every request, so the claim is a hint, not a credential.
+[auth.hook.custom_access_token]
+enabled = true
+uri = "pg-functions://postgres/public/custom_access_token_hook"

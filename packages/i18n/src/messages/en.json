@@ -1,0 +1,166 @@
+{
+  "app": { "name": "School", "loading": "Loading…", "offlineQueue": "{count, plural, one {# change waiting to sync} other {# changes waiting to sync}}" },
+  "common": { "save": "Save", "cancel": "Cancel", "search": "Search", "export": "Export", "language": "Language", "skip": "Skip to content" },
+  "auth": { "signIn": "Sign in", "phone": "Mobile number", "sendOtp": "Send code", "code": "6-digit code", "verify": "Verify", "chooseSchool": "Choose your school", "or": "or", "withPhone": "With your mobile number", "withEmail": "With email and password", "email": "Email", "password": "Password", "err": { "fields": "Enter your email and password.", "wrong": "Email or password is incorrect." } },
+  "vendor": { "leads": "Demo requests", "handled": "Handled", "markHandled": "Mark handled", "console": "Vendor Console", "plans": "Plans", "flags": "Feature flags", "contactUs": "Contact us", "legalRef": "Written legal opinion reference", "legalMissing": "No legal opinion on record — cannot be switched on", "on": "On", "off": "Off", "turnOn": "Turn on", "turnOff": "Turn off", "tenants": "Schools", "slug": "School address (e.g. noor-academy)", "schoolName": "School name", "create": "Create school", "reason": "Why do you need access? (min 10 characters)", "ticket": "Support ticket", "impersonate": "Start support session (30 min, audited)", "supportOff": "This school has turned off support access." },
+  "tenant": { "notFound": "We couldn't find this school.", "suspended": "This school's account is read-only. Please contact the school office." },
+  "notify": {
+    "absent": "{school}: {student} was marked absent from school today ({date}).",
+    "feeReminder": {
+      "gentle": "{school}: fee voucher {voucherNo} of {amount} is due on {dueDate}. Pay using consumer no. {consumerNo}.",
+      "firm": "{school}: reminder — fee voucher {voucherNo} of {amount} was due on {dueDate} and is still unpaid. Consumer no. {consumerNo}.",
+      "final": "{school}: final reminder — fee voucher {voucherNo} ({amount}) is unpaid. Please pay as soon as possible or contact the school office. Consumer no. {consumerNo}."
+    },
+    "resultsPublished": "{school}: {student}'s {exam} results are now available.",
+    "resultsAmended": "{school}: a correction was made to {student}'s {exam} results."
+  },
+  "nav": { "cockpit": "Cockpit", "students": "Students", "fees": "Fees", "accounts": "Accounts", "settings": "Settings", "auditLog": "Audit log", "approvals": "Approvals", "attendance": "Attendance", "exams": "Exams", "payroll": "Payroll", "admissions": "Admissions", "myFamily": "My family", "signOut": "Sign out", "switchSchool": "Switch school", "language": "اردو" },
+  "ui": {
+    "readOnly": "This school's account is read-only right now.",
+    "noAccess": "You don't have access to this page.",
+    "ok": "Done.",
+    "empty": "Nothing here yet.",
+    "date": "Date", "status": "Status", "amount": "Amount", "name": "Name", "phone": "Phone", "actions": "Actions", "back": "Back", "print": "Print", "grade": "Grade", "position": "Position", "campus": "Campus", "cancelled": "Cancelled", "total": "Total", "balance": "Balance", "paid": "Paid", "due": "Due"
+  },
+  "cockpit": {
+    "title": "Today at school", "students": "Students enrolled", "outstanding": "Fees outstanding", "overdue": "Overdue", "overdueFamilies": "{count} families", "collectedToday": "Collected today", "collectedMonth": "Collected this month",
+    "unmatched": "Bank lines to match", "attendance": "Attendance today", "present": "Present", "absent": "Absent", "marked": "{done} of {total} sections marked", "admissions": "Open inquiries", "followUps": "Follow-ups due", "approvals": "Waiting for you"
+  },
+  "approvals": {
+    "title": "Approvals", "empty": "Nothing is waiting for approval.", "approve": "Approve", "reject": "Reject", "post": "Post payroll", "publish": "Publish results",
+    "kind": { "concession": "Fee concession", "payroll": "Payroll run", "results": "Results", "bank_line": "Bank deposit to match" }
+  },
+  "fees": {
+    "title": "Fees", "voucher": "Voucher", "family": "Family", "student": "Student", "consumerNo": "Consumer no.", "collect": "Collect payment", "channel": "Method", "cash": "Cash", "bank": "Bank transfer", "record": "Record payment",
+    "recorded": "Payment recorded.", "openSession": "Open my cash drawer", "drawerOpened": "Cash drawer opened.", "noSession": "Open your cash drawer before taking cash.", "challan": "Fee challan", "parentCopy": "Parent copy", "bankCopy": "Bank copy", "schoolCopy": "School copy",
+    "payInstructions": "Pay at any bank branch or through your banking app using the consumer number above.", "searchHint": "Voucher no. or consumer no.", "agingBucket": "Overdue", "collectFor": "Collect for {name}", "statement": "Statement", "ourDue": "Amount due by {date}"
+  },
+  "students": {
+    "title": "Students", "enrol": "Enrol a student", "fullName": "Student's full name", "class": "Class", "section": "Section", "guardianName": "Guardian's name", "guardianPhone": "Guardian's mobile number", "dob": "Date of birth",
+    "gender": "Gender", "female": "Girl", "male": "Boy", "other": "Other", "enrolled": "Student enrolled.", "admissionNo": "Admission no.", "siblingsNote": "If this phone number is already on file, the child is linked to that family."
+  },
+  "attendance": { "title": "Attendance", "section": "Class and section", "tickAbsent": "Tick only the children who are absent. Everyone else is marked present.", "late": "Late", "leave": "On leave", "save": "Save register", "saved": "Register saved." },
+  "family": { "title": "My family", "children": "Children", "fees": "Fees", "noFees": "No fee vouchers yet.", "results": "Results", "noResults": "No published results yet.", "attendance": "Attendance" },
+  "payroll": { "title": "Payroll", "prepare": "Prepare payroll for", "period": "Month", "gross": "Gross", "deductions": "Deductions", "net": "Net pay", "markPaid": "Mark as paid", "draft": "Waiting to be posted", "posted": "Posted", "paid": "Paid", "voided": "Voided", "prepared": "Payroll prepared.", "postedOk": "Payroll posted." },
+  "exams": { "title": "Exams", "subject": "Subject", "maxMarks": "Maximum marks", "entered": "Marks entered", "enterMarks": "Enter marks", "entryHint": "Type marks, or A for absent and E for excused.", "reason": "Reason for the change","stage": { "draft": "Draft", "marking": "Marking", "moderation": "Moderation", "published": "Published" }, "advance": "Move to {stage}", "published": "Results published." },
+  "admissions": { "title": "Admissions", "newInquiry": "New inquiry", "child": "Child's name", "guardian": "Guardian's name", "stage": "Stage", "followUp": "Follow up on", "move": "Move to", "created": "Inquiry saved.",
+    "stages": { "inquiry": "Inquiry", "visit_scheduled": "Visit scheduled", "test_scheduled": "Test scheduled", "offered": "Offered", "accepted": "Accepted", "enrolled": "Enrolled", "declined": "Declined", "lost": "Lost" } },
+  "security": {
+    "title": "Two-step sign-in", "why": "Money, payroll and admin actions need a second step. Use an authenticator app on your phone.", "setUp": "Set up authenticator app",
+    "scan": "Scan this code with your authenticator app, then enter the 6-digit code it shows.", "orType": "Or type this key:", "confirm": "Turn on", "enabled": "Two-step sign-in is now on.",
+    "stepUp": "Enter the 6-digit code from your authenticator app to continue.", "active": "Two-step sign-in is on for this session.", "banner": "Turn on two-step sign-in", "link": "Security",
+    "err": { "start": "We could not start setup. Please try again.", "enterCode": "Enter the 6-digit code from your app.", "retry": "We could not check that code. Please try again.", "wrongCode": "That code is wrong or has expired.", "noFactor": "No authenticator app is set up for this account." }
+  },
+  "finance": {
+    "nav": { "setup": "Fee setup", "concessions": "Concessions", "reconcile": "Bank matching", "payslips": "My payslips" },
+    "generated": "{n} vouchers issued.",
+    "setup": {
+      "title": "Fee setup", "heads": "Fee heads", "code": "Code", "account": "Income account", "freq": "How often", "frequency": { "monthly": "Monthly", "annual": "Yearly", "one_off": "One time" },
+      "structures": "Fees by class", "createStructure": "Create fee structure", "finePolicy": "Late fee", "graceDays": "Grace days after the due date", "fineAmount": "Late fee (once per voucher)",
+      "generate": "Issue monthly vouchers", "allClasses": "All classes", "dueDays": "Days until due", "generateNote": "Safe to repeat: a student who already has a voucher for the month is skipped."
+    },
+    "concessions": {
+      "title": "Fee concessions", "request": "Request a concession", "kind": "Type", "percent": "Percent of fee", "fixed": "Fixed amount", "value": "Value", "reason": "Reason", "wholeVoucher": "Whole voucher",
+      "requested": "Request sent for approval.", "note": "Someone else must approve it in Approvals. You cannot approve your own request.", "status": { "pending": "Waiting", "approved": "Approved", "rejected": "Rejected" }
+    },
+    "voucher": {
+      "plan": "Agree an instalment plan", "planDates": "Instalment dates, one per line (YYYY-MM-DD)", "planCreated": "Instalment plan created.", "promise": "Record a promise to pay", "promiseDate": "Promised date (within 60 days)", "promiseSaved": "Promise recorded.",
+      "cancel": "Cancel this voucher", "cancelNote": "Cancelling reverses its entries in the books. A new voucher can then be issued for the month.", "cancelled": "Voucher cancelled."
+    },
+    "reconcile": {
+      "title": "Match bank deposits", "auto": "Match automatically", "unmatched": "Not yet matched", "line": "Bank line", "matchTo": "Match to voucher", "match": "Match", "ignore": "Ignore", "import": "Import bank statement",
+      "ref": "Statement name", "mapHint": "Type the column headings exactly as they appear in your bank's file.", "colDate": "Date column", "dateFormat": "Date format", "colDesc": "Description column", "colRef": "Reference column", "colCredit": "Credit column", "colAmount": "Single amount column (instead of credit)",
+      "imported": "{n} new lines imported, {s} skipped.", "matched": "{n} lines matched."
+    },
+    "accounts": {
+      "title": "Accounts", "from": "From", "to": "To", "billed": "Billed", "collected": "Collected", "cash": "Cash in hand", "balanced": "Books balance", "pl": "Income and expenses", "bs": "Balance sheet",
+      "income": "Income", "expense": "Expenses", "surplus": "Surplus", "assets": "Assets", "liabilities": "Liabilities", "equity": "Equity"
+    },
+    "payslips": { "title": "My payslips", "basic": "Basic pay" }
+  },
+  "mobile": {
+    "tab": { "home": "Home", "more": "More" },
+    "login": { "welcome": "Welcome", "tagline": "Fees, attendance and results for your school.", "badPhone": "Enter a Pakistani mobile number, for example 0300 1234567.", "sendFailed": "We could not send a code to that number.", "badCode": "Enter the 6-digit code.", "wrongCode": "That code is wrong or has expired.", "codeSent": "We sent a code to {phone}." },
+    "fees": { "payWith": "Pay at any bank or in your banking app using this consumer number:", "copy": "Copy number", "copied": "Copied" },
+    "results": { "open": "View report card" },
+    "att": { "noRoster": "This class list has not been downloaded yet. Connect to the internet once to load it.", "queued": "Saved on this phone. It will be sent when you are online.", "waiting": "{count} register(s) waiting to be sent", "syncNow": "Send now", "dismiss": "Dismiss", "hint": "Tap a child to change: present, absent, late, on leave." },
+    "more": { "signedIn": "Signed in", "privacy": "This app does not use your location, camera or microphone." }
+  },
+  "plan": { "notIncluded": "This feature is not part of your school's plan. Please contact your account manager." },
+  "marketing": {
+    "hero": { "title": "Your school, running itself.", "subtitle": "Fees that balance to the rupee, results parents can trust, attendance and messages that reach every family — in English and Urdu.", "cta": "Book a free demo" },
+    "nav": { "features": "What it does", "apps": "Apps", "pricing": "Pricing", "privacy": "Privacy and children", "demo": "Book a demo" },
+    "footer": "Built for schools in Pakistan. No ads. No trackers.",
+    "landing": {
+      "eyebrow": "Built for schools in Pakistan", "heroNote": "No ads. No trackers. Urdu and English from the first screen.", "ctaApps": "See the apps",
+      "dragHint": "Drag to look around", "campusLabel": "A small 3D school campus rising out of the ground, with a school bus driving around it",
+      "strip": { "urdu": "Urdu and English", "offline": "Works without internet", "balanced": "Books that always balance", "private": "No ads, no trackers" },
+      "featuresSub": "Everything a school office does every day — in one place, with a clear record of who did what.",
+      "offlineTitle": "Works without internet", "offlineBody": "Teachers can mark attendance with no signal. Registers wait safely on the phone and are sent when the connection returns.",
+      "how": {
+        "title": "How it works",
+        "s1": { "t": "Set up your school", "b": "Add your classes, fee heads and students. Brothers and sisters are linked automatically by the parent's phone number." },
+        "s2": { "t": "Collect and teach", "b": "Issue monthly vouchers, take payments, mark attendance and enter marks. Every action is recorded and nothing is edited behind your back." },
+        "s3": { "t": "Parents see everything", "b": "Fee challans, attendance and report cards — in the parent's own language, on their phone." }
+      },
+      "apps": {
+        "title": "Apps for everyone at school", "sub": "One sign-in. The right tools for each person.", "cta": "Where to get the apps",
+        "parentBody": "See each child's attendance, fee vouchers with the number to pay, and published report cards.",
+        "teacherBody": "Mark the register in seconds, even with no signal. It is sent automatically when you are back online.",
+        "officeBody": "Fees, admissions, exams, payroll, approvals and reports — on any computer or phone browser."
+      },
+      "final": { "title": "See it for your school", "body": "Book a free demo and we will walk you through it with your own classes and fees in mind." }
+    },
+    "apps": { "parent": "Parents", "teacher": "Teachers", "office": "School office" },
+    "mock": {
+      "caption": "Sample screens of the parent and teacher apps", "sample": "Sample data", "school": "Noor Academy", "child": "Zara Ahmed · 5-A", "feeDue": "Fee due 11 Nov", "exam": "Mid-term results",
+      "s1": "Amna Khan", "s2": "Bilal Khan", "s3": "Zara Ahmed", "s4": "Hamza Raza", "s5": "Maryam Ali"
+    },
+    "appsPage": {
+      "title": "The apps", "sub": "Where to find them, and how to put them on your phone today.", "available": "Available now", "testing": "In testing", "openWeb": "Open the web app",
+      "installTitle": "Put it on your home screen", "installSub": "The web app installs like an app — own icon, full screen, and a friendly page when you are offline. No store needed.",
+      "android": { "a1": "Open the web app in Chrome.", "a2": "Tap the menu (three dots).", "a3": "Tap “Install app” or “Add to Home screen”." },
+      "ios": { "i1": "Open the web app in Safari.", "i2": "Tap the Share button.", "i3": "Tap “Add to Home Screen”." },
+      "computer": "Computer", "pc": { "c1": "Open the web app in Chrome or Edge.", "c2": "Click the install icon at the right of the address bar." },
+      "storeTitle": "Store apps are on the way", "storeBody": "The parent and teacher apps for Android and iPhone are built and being tested with schools. They will appear in the stores when testing is done. Want to be among the first? Book a demo."
+    },
+    "ready": {
+      "title": "Ready today",
+      "fees": { "title": "Fee collection", "body": "Monthly vouchers, a printable challan, cash and bank payments, instalment plans, promises to pay and gentle reminders." },
+      "ledger": { "title": "Books that always balance", "body": "Every rupee that moves is recorded in a double-entry ledger in the same moment. Corrections are reversals, never edits." },
+      "results": { "title": "Exams and report cards", "body": "Teachers enter marks for their own classes, a coordinator moderates, and results are frozen when published." },
+      "attendance": { "title": "Attendance and parent messages", "body": "Mark a class in seconds. Parents are told about an absence in their own language, within the hours they choose." },
+      "urdu": { "title": "Urdu and English", "body": "Every screen and message exists in both languages, and right-to-left is first class, not an afterthought." }
+    },
+    "next": {
+      "title": "Coming next", "soon": "Coming soon",
+      "saferoute": { "title": "SafeRoute", "body": "Live school-bus tracking with the driver's app. Anything involving a child's own phone needs the family's recorded consent first." },
+      "compass": { "title": "Learning Compass", "body": "A current, human-reviewed picture of how each child learns best. Never a label, never a diagnosis." }
+    },
+    "trust": {
+      "title": "Our promises",
+      "noAds": "No advertising and no third-party trackers in school portals or apps.",
+      "consent": "No child is tracked without explicit, recorded consent that a parent can withdraw.",
+      "isolation": "Each school's data is separated inside the database itself, not only in the app.",
+      "noLabels": "We never label a child. Notes are current, reviewed by a person, and never a diagnosis."
+    },
+    "pricing": {
+      "title": "Pricing", "subtitle": "Priced per active student per month. We'll quote you for your school — no hidden add-ons.", "unavailable": "Plans are being updated. Please book a demo and we'll share them.",
+      "students": "Up to {n} students", "campuses": "Up to {n} campus(es)", "manyCampuses": "Many campuses",
+      "feature": { "double_entry_accounting": "Full double-entry accounts", "payroll": "Payroll", "exams_kit": "Exams and report cards", "admissions_crm": "Admissions pipeline", "custom_domain": "Your own web address", "api": "API access" }
+    },
+    "demo": {
+      "title": "Book a free demo", "thanks": "Thank you. We'll call you soon.", "name": "Your name", "school": "School name", "city": "City", "email": "Email (optional)", "size": "Number of students", "message": "Anything we should know? (optional)", "send": "Request a demo",
+      "err": { "phone": "Please enter a Pakistani mobile number, for example 0300 1234567.", "fields": "Please check your name and school name.", "failed": "We couldn't save your request. Please try again." }
+    },
+    "privacy": {
+      "title": "Privacy and children", "intro": "These are the rules the product is built to follow.", "legal": "This page describes how the product behaves. It is not a legal privacy policy.",
+      "isolation": { "q": "Can another school see our data?", "a": "No. Every table is locked to the school that owns it by the database itself. A bug in the app cannot open it." },
+      "consent": { "q": "Is a child ever tracked without asking?", "a": "No. Location features need a parent's explicit, recorded consent, and consent can be withdrawn at any time." },
+      "noAds": { "q": "Are there ads or trackers?", "a": "No advertising or third-party tracking scripts in school portals or apps." },
+      "noLabels": { "q": "Do you label children?", "a": "No. Learning notes are current, written or reviewed by a person, and are never a diagnosis." },
+      "humans": { "q": "Does automation make decisions?", "a": "Automation can suggest. A permitted person approves. Money, results and payroll changes always have a person behind them." },
+      "access": { "q": "Who at the vendor can look at our school?", "a": "Only with a written reason and a ticket, only if your school allows it, for 30 minutes, and your owner can see every session. Money, location and counsellor records are never reachable." }
+    }
+  }
+}

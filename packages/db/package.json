@@ -1,0 +1,1 @@
+{"name":"@ilmora/db","version":"0.1.0","private":true,"type":"module","main":"src/index.ts","devDependencies":{"@types/pg":"^8.23.1","pg":"^8.23.1"}}

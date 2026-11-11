@@ -1,0 +1,20 @@
+:root {
+  --bg: #23303A;
+  --surface-1: #2C3B47;
+  --surface-2: #364756;
+  --paper: #F4F1E8;
+  --paper-ink: #1E252B;
+  --paper-rule: #C9D6E3;
+  --paper-margin: #E57373;
+  --line-slate: #46596A;
+  --line-paper: #D9D2C3;
+  --ink: #F4F6F8;
+  --ink-2: #C5D0DA;
+  --ink-3: #9AAAB8;
+  --accent: #FFB547;
+  --accent-text: #1A1F24;
+  --accent-2: #4FD1A5;
+  --accent-3: #6CB8FF;
+  --warn: #F59E0B;
+  --danger: #FF7B7B;
+}

@@ -1,0 +1,26 @@
+# dependencies & build output
+node_modules
+.next
+dist
+*.tsbuildinfo
+.turbo
+
+# secrets and local-only files — NEVER commit these
+.env
+.env.local
+.env.*.local
+dev-logins.local.txt
+*.keystore
+*.jks
+*.p12
+*.mobileprovision
+
+# generated mobile projects (CI regenerates them with `expo prebuild`)
+apps/mobile/android
+apps/mobile/ios
+apps/mobile/.expo
+apps/mobile/web-build
+
+# scratch output from the verification scripts
+.shots
+packages/db/dist

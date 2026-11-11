@@ -1,0 +1,23 @@
+{
+  "expo": {
+    "name": "School",
+    "slug": "school-app",
+    "version": "0.1.0",
+    "scheme": "schoolapp",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "icon": "./assets/icon.png",
+    "backgroundColor": "#23303A",
+    "splash": { "image": "./assets/splash-icon.png", "resizeMode": "contain", "backgroundColor": "#23303A" },
+    "plugins": ["expo-router"],
+    "experiments": { "typedRoutes": false },
+    "ios": { "supportsTablet": false, "bundleIdentifier": "pk.example.school" },
+    "android": {
+      "package": "pk.example.school",
+      "permissions": [],
+      "adaptiveIcon": { "foregroundImage": "./assets/adaptive-icon.png", "backgroundColor": "#23303A" }
+    },
+    "web": { "bundler": "metro", "output": "single", "favicon": "./assets/favicon.png" },
+    "extra": { "note": "App name, bundle ids and artwork are placeholders until the product name is decided (open question 1); regenerate artwork with apps/web/scripts/make-icons.mjs. No location, camera or microphone permission is requested." }
+  }
+}
