@@ -48,7 +48,7 @@ const parent = await cookieFor('parent@noor-academy.test');
 const teacher = await cookieFor('teacher@noor-academy.test');
 const owner = await cookieFor('owner@noor-academy.test');
 
-await page('login page renders both sign-in methods', 'app.localhost', '/portal/login', null, { text: ['Send code', 'Email', 'name="email"', 'name="password"', 'auth-shell', 'Forgot your password'], absent: ['Mobile number'] });
+await page('login page renders both sign-in methods', 'app.localhost', '/portal/login', null, { text: ['Send code', 'Email', 'name="email"', 'name="password"', 'auth-split', 'Forgot your password', 'Activate my account'], absent: ['Mobile number'] });
 await page('signed-out visitor to /portal/schools is sent to login', 'app.localhost', '/portal/schools', null, { status: 307, loc: '/portal/login' });
 await page('vendor console renders tenants list', 'vendor.localhost', '/vendor/tenants', vendor, { text: ['Noor Academy', 'City Grammar School', 'Crescent'] });
 await page('vendor plans page lists the 4 plans', 'vendor.localhost', '/vendor/plans', vendor, { text: ['Starter', 'Growth', 'Chain', 'Enterprise', 'Contact us'] });
@@ -73,7 +73,7 @@ await page('ADMISSIONS shows both inquiries', A, '/portal/admissions', owner, { 
 await page('PARENT sees only their own children', A, '/portal/family', parent, { text: ['Amna Khan', 'Bilal Khan'], absent: ['Zara Ahmed', 'Daniyal Chaudhry'] });
 await page('PARENT is not shown staff menus', A, '/portal/family', parent, { text: ['My family'], absent: ['Fee setup', 'Payroll', 'Bank matching'] });
 await page('PARENT sent away from the accounts page', A, '/portal/accounts', parent, { status: 307, loc: '/portal' });
-await page('MENU is grouped for the owner', A, '/portal', owner, { text: ['class="navgroup"', 'People', 'Money', 'Academics', 'Staff', 'Timetable'] });
+await page('MENU is grouped by topic for the owner', A, '/portal', owner, { text: ['class="navgroup"', 'Students', 'Fees', 'Staff &amp; buses', 'Timetable', 'Add a student', 'Collect a fee'] });
 await page('STAFF page: list, staff attendance and add form', A, '/portal/staff', owner, { text: ['Staff list', 'Staff attendance', 'Add staff member'] });
 await page('TIMETABLE page: subjects, bell periods, class picker', A, '/portal/timetable', owner, { text: ['Timetable', 'Subjects', 'Bell periods', 'Add period'] });
 await page('SECURITY page offers a password change', A, '/portal/security', owner, { text: ['Change password', 'name="again"'] });
@@ -102,8 +102,9 @@ await page('PARENT sees the school bus section with consent state', A, '/portal/
 await page('PARENT bus page renders', A, '/portal/family/bus', parent, { text: ['School bus', 'Amna'], absent: ['Zara'] });
 await page('PARENT cannot open the staff live-bus page', A, '/portal/transport/live', parent, { status: 307, loc: '/portal' });
 
+await page('VENDOR add-people page lists the schools', 'vendor.localhost', '/vendor/people', vendor, { text: ['Add people to a school', 'Noor Academy', 'School owner'] });
 // Logins (invites): users.manage needs 2FA, so the demo owner (no 2FA) gets the explanation, not the form; a teacher is sent away
-await page('PEOPLE page tells an owner without 2FA how to get access', A, '/portal/people', owner, { text: ['People and logins', '/portal/security'], absent: ['name="email"'] });
+await page('ADD PEOPLE page: the owner (no 2FA) can add teachers, drivers, accountants', A, '/portal/people', owner, { text: ['Add people', 'name="email"', 'Teacher', 'Driver', 'Accountant'], absent: ['School owner</option>'] });
 await page('MENU shows Logins to the owner', A, '/portal', owner, { text: ['/portal/people'] });
 await page('TEACHER cannot open people', A, '/portal/people', teacher, { status: 307, loc: '/portal' });
 

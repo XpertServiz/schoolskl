@@ -16,6 +16,8 @@ export default function TabsLayout() {
   return (
     <Tabs screenOptions={{
       headerShown: false,
+      sceneStyle: { backgroundColor: 'transparent' }, // let the one shared night sky show through every tab
+      lazy: true,
       tabBarStyle: { backgroundColor: '#101821', borderTopColor: color.line, height: 64, paddingBottom: 8, paddingTop: 6 },
       tabBarActiveTintColor: color.accent, tabBarInactiveTintColor: color.ink3,
       tabBarLabelStyle: { fontWeight: '700', fontSize: 11 },

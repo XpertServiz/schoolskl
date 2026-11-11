@@ -9,7 +9,7 @@ export default function More() {
   const { tr, access, locale, setLocale, signOut, rtl } = useApp();
   const router = useRouter();
   const [email, setEmail] = useState('');
-  useEffect(() => { supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? '')); }, []);
+  useEffect(() => { supabase.auth.getSession().then(({ data }) => setEmail(data.session?.user.email ?? '')); }, []);
   return (
     <Screen>
       <ScrollView contentContainerStyle={{ padding: 18, gap: 14, paddingBottom: 40 }}>

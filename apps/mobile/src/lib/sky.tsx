@@ -14,7 +14,7 @@ export function StarSky({ moon = true }: { moon?: boolean }) {
   const groups = useRef([new Animated.Value(1), new Animated.Value(0.6), new Animated.Value(0.85)]).current;
   const stars = useMemo(() => {
     seed = 42;
-    return Array.from({ length: 90 }, (_, i) => {
+    return Array.from({ length: 60 }, (_, i) => {
       const big = rnd() > 0.9;
       return { x: rnd() * width, y: rnd() * height * 0.78, r: big ? 2.4 : 0.8 + rnd() * 1.2, g: i % 3, tint: rnd() < 0.15 ? '#FFE3B0' : rnd() < 0.3 ? '#CFE0FF' : '#FFFFFF' };
     });

@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { View } from 'react-native';
 import { startSync } from '@/lib/queue';
 import { AppProvider, useApp } from '@/lib/session';
+import { StarSky } from '@/lib/sky';
 import { AnimatedSplash } from '@/lib/splash';
 import { color, Loading } from '@/lib/ui';
 
@@ -30,6 +31,7 @@ export default function Root() {
     <AppProvider>
       <View style={{ flex: 1, backgroundColor: color.bg }}>
         <StatusBar style="light" />
+        <StarSky />
         <Gate />
         <Splash />
       </View>

@@ -4,7 +4,6 @@ import { useRef, type ComponentProps, type ReactNode } from 'react';
 import { ActivityIndicator, Animated, Pressable, StyleSheet, Text, TextInput, View, type TextInputProps, type TextProps, type ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useApp } from './session';
-import { StarSky } from './sky';
 
 // Slate & Saffron (dark): values mirror packages/ui tokens; kept literal here because React Native has no CSS variables.
 export const color = {
@@ -42,8 +41,8 @@ export function Press({ children, onPress, disabled, style, label, outer }: { ch
 /** Background for every screen: the night sky (stars, moon, ridges) with a soft warm glow, inside the safe area. */
 export function Screen({ children }: { children: ReactNode }) {
   return (
-    <View style={{ flex: 1, backgroundColor: color.bg }}>
-      <StarSky />
+    // transparent: the night sky is drawn ONCE behind the whole app (app/_layout.tsx), not again on every screen
+    <View style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>{children}</SafeAreaView>
     </View>
   );

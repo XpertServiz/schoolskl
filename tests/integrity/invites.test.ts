@@ -68,12 +68,50 @@ describe('invite_member', () => {
     expect((await admin<{ user_id: string }>(db, `select user_id from public.staff_members where id = $1`, [st])).rows[0]!.user_id).toBe(u);
   });
 
-  it('needs users.manage WITH 2FA: a cashier, a parent and an owner at aal1 are refused', async () => {
+  it('a cashier and a parent can never add people', async () => {
     const u = await newAuthUser('x');
     await expect(q(db, s.cashier, `select public.invite_member($1,'X','teacher')`, [u])).rejects.toThrow(/permission denied/);
     await expect(q(db, s.parent, `select public.invite_member($1,'X','teacher')`, [u])).rejects.toThrow(/permission denied/);
-    await expect(q(db, w.as(ids.ownerA, s.tenant, { aal: 'aal1' }), `select public.invite_member($1,'X','teacher')`, [u])).rejects.toThrow(/permission denied/);
     expect(await rolesOf(s.tenant, u)).toEqual([]);
+  });
+
+  it('the school owner can add teachers, drivers, accountants WITHOUT 2FA — but admin-level roles still need 2FA', async () => {
+    const aal1 = w.as(ids.ownerA, s.tenant, { aal: 'aal1' });
+    for (const role of ['teacher', 'driver', 'accountant', 'cashier', 'parent']) {
+      const u = await newAuthUser(role);
+      await q(db, aal1, `select public.invite_member($1,$2,$3)`, [u, `Test ${role}`, role]);
+      expect(await rolesOf(s.tenant, u)).toEqual([role]);
+    }
+    const x = await newAuthUser('boss');
+    for (const role of ['school_owner', 'principal', 'it_admin']) {
+      await expect(q(db, aal1, `select public.invite_member($1,'Boss',$2)`, [x, role])).rejects.toThrow(/two-step sign-in/);
+    }
+    expect(await rolesOf(s.tenant, x)).toEqual([]);
+    await q(db, s.owner, `select public.invite_member($1,'Boss','principal')`, [x]); // with 2FA it works
+    expect(await rolesOf(s.tenant, x)).toEqual(['principal']);
+    expect((await q<{ r: { can: boolean } }>(db, aal1, `select public.people_access() r`)).rows[0]!.r.can).toBe(true);
+  });
+
+  it('a teacher/driver added this way gets a staff record automatically (numbered), a parent does not', async () => {
+    const t = await newAuthUser('tt'), p = await newAuthUser('pp');
+    await q(db, s.owner, `select public.invite_member($1,'Auto Teacher','teacher')`, [t]);
+    await q(db, s.owner, `select public.invite_member($1,'Auto Parent','parent')`, [p]);
+    const st = (await admin<{ employee_no: string; designation: string }>(db, `select employee_no, designation from public.staff_members where user_id = $1`, [t])).rows;
+    expect(st).toHaveLength(1);
+    expect(st[0]!.employee_no).toMatch(/^S-\d{4}$/);
+    expect((await admin(db, `select 1 from public.staff_members where user_id = $1`, [p])).rows).toHaveLength(0);
+    await q(db, s.owner, `select public.invite_member($1,'Auto Teacher','teacher')`, [t]); // twice: still one record
+    expect((await admin(db, `select 1 from public.staff_members where user_id = $1`, [t])).rows).toHaveLength(1);
+  });
+
+  it('the platform super admin can add people to any school; support staff, owners of other schools and the school itself cannot use that door', async () => {
+    const u = await newAuthUser('vend');
+    await q(db, w.as(ids.vendorAdmin, null), `select public.vendor_add_member($1,$2,'Vendor Added','accountant')`, [s.tenant, u]);
+    expect(await rolesOf(s.tenant, u)).toEqual(['accountant']);
+    expect((await admin<{ n: number }>(db, `select count(*)::int n from public.audit_log where action = 'vendor_add_member' and tenant_id = $1`, [s.tenant])).rows[0]!.n).toBe(1);
+    await expect(q(db, w.as(ids.vendorSupport, null), `select public.vendor_add_member($1,$2,'X','teacher')`, [s.tenant, u])).rejects.toThrow(/permission denied/);
+    await expect(q(db, s.owner, `select public.vendor_add_member($1,$2,'X','teacher')`, [s.tenant, u])).rejects.toThrow(/permission denied/);
+    await expect(q(db, other.owner, `select public.vendor_add_member($1,$2,'X','teacher')`, [s.tenant, u])).rejects.toThrow(/permission denied/);
   });
 
   it('no escalation: an IT admin can grant a teacher role but not principal, accountant or owner', async () => {
@@ -123,5 +161,20 @@ describe('invite_member', () => {
     await expect(q(db, s.owner, `select public.auth_user_id('x@example.test')`)).rejects.toThrow(/permission denied/);
     const r = (await q<{ id: string }>(db, null, `select public.auth_user_id($1) id`, [' ownerA@EXAMPLE.test '], 'service_role')).rows[0]!.id;
     expect(r).toBe(ids.ownerA);
+  });
+});
+
+describe('my_access is fast AND identical to has_permission', () => {
+  it('lists exactly the keys has_permission grants — owner (2FA / no 2FA), cashier, parent, teacher, and with grant + deny overrides', async () => {
+    const slow = async (c: Claims) => (await q<{ k: string[] }>(db, c, `select coalesce(array_agg(key order by key), '{}') k from public.permissions where app.has_permission(key)`)).rows[0]!.k;
+    const fast = async (c: Claims) => (await q<{ p: string[] }>(db, c, `select public.my_access() -> 'permissions' as p`)).rows[0]!.p;
+    const teacher = w.as(ids.teacherA, s.tenant);
+    const who: [string, Claims][] = [['owner', s.owner], ['owner aal1', w.as(ids.ownerA, s.tenant, { aal: 'aal1' })], ['cashier', s.cashier], ['parent', s.parent], ['teacher', teacher]];
+    // overrides: teacher is granted fees.view and denied attendance.mark; cashier is denied fees.collect
+    await admin(db, `insert into public.user_permission_overrides (tenant_id, user_id, permission_key, effect) values ($1,$2,'fees.view','grant'), ($1,$2,'attendance.mark','deny'), ($1,$3,'fees.collect','deny')`, [s.tenant, ids.teacherA, s.userIds.cashier]);
+    for (const [name, c] of who) expect(await fast(c), name).toEqual(await slow(c));
+    expect(await fast(teacher)).toContain('fees.view');
+    expect(await fast(teacher)).not.toContain('attendance.mark');
+    expect(await fast(s.cashier)).not.toContain('fees.collect');
   });
 });

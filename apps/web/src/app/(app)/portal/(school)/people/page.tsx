@@ -5,6 +5,7 @@ import { t } from '@ilmora/i18n';
 import { Flash } from '@/components/flash';
 import { findOrCreateLogin } from '@/lib/invite';
 import { done, fail, getLocale, need, portal } from '@/lib/portal';
+import { ADMIN_ROLES, ROLE_ORDER } from '@/lib/roles';
 import { supabaseServer } from '@/lib/supabase/server';
 
 export const metadata = { title: 'People and logins', robots: { index: false, follow: false } };
@@ -12,7 +13,7 @@ const here = '/portal/people';
 const uuid = z.string().uuid();
 const opt = (v: FormDataEntryValue | null) => (String(v ?? '').trim() || null);
 
-const ERR: Record<string, string> = { self: 'people.err.self', owner: 'people.err.owner', escalation: 'people.err.escalation', guardian_linked: 'people.err.linked', staff_linked: 'people.err.linked', role: 'people.err.role' };
+const ERR: Record<string, string> = { self: 'people.err.self', owner: 'people.err.owner', escalation: 'people.err.escalation', guardian_linked: 'people.err.linked', staff_linked: 'people.err.linked', role: 'people.err.role', mfa: 'people.err.mfa' };
 const errKey = (e: { message: string; hint?: string | null }) => ERR[e.hint ?? ''] ?? null;
 
 async function invite(form: FormData) {
@@ -23,8 +24,8 @@ async function invite(form: FormData) {
   if (!r.success) return fail(here, { message: t(loc, 'people.err.fields') });
   const sb = await supabaseServer();
   // the caller's own permission first — only then may the service role touch Auth
-  const { data: me } = await sb.rpc('my_access');
-  if (!me?.permissions?.includes('users.manage')) return fail(here, { message: t(loc, 'people.err.mfa') });
+  const { data: pa } = await sb.rpc('people_access'); // the database decides: the school owner, or users.manage with 2FA
+  if (!pa?.can) return fail(here, { message: t(loc, 'people.err.fields') });
   let login: { id: string; created: boolean };
   try { login = await findOrCreateLogin(r.data.email, r.data.name); } catch { return fail(here, { message: t(loc, 'people.err.login') }); }
   const { error } = await sb.rpc('invite_member', { p_user: login.id, p_full_name: r.data.name, p_role_key: r.data.role, p_guardian: r.data.guardian, p_staff: r.data.staff });
@@ -57,20 +58,15 @@ async function removeRole(form: FormData) {
   done(here, t(loc, 'people.saved'));
 }
 
-// The roles a school normally hands out, in the order people look for them. Others (vendor-ish, future modules) stay hidden from the picker.
-const ROLE_ORDER = ['parent', 'teacher', 'class_teacher', 'coordinator', 'principal', 'campus_admin', 'accountant', 'cashier', 'admissions_officer',
-  'exam_controller', 'hr_manager', 'transport_manager', 'driver', 'bus_attendant', 'it_admin', 'school_owner'];
-
 type Member = { user_id: string; full_name: string | null; email: string; status: string; roles: string[]; guardian_of: string[]; staff_no: string | null; last_sign_in_at: string | null };
 
 export default async function People({ searchParams }: { searchParams: Promise<{ ok?: string; err?: string }> }) {
   const p = await portal();
   const sp = await searchParams;
-  // users.manage needs 2FA: an owner without it is told how to get there instead of being bounced
-  if (!p.can('users.manage')) {
-    if (!p.mfaOff || !p.can('settings.manage')) need(p, 'users.manage'); // only school managers are told about 2FA; others are sent away
-    return (<><h1>{p.tr('people.title')}</h1><p role="status" className="notice"><Link href="/portal/security">{p.tr('people.err.mfa')}</Link></p></>);
-  }
+  // the school owner can always add teachers, drivers, accountants …; admin-level roles (owner, principal, IT admin) need a 2FA session
+  const { data: pa } = await p.sb.rpc('people_access');
+  if (!pa?.can) need(p, 'users.manage'); // everyone else is sent away
+  const adminOk = !!pa?.admin_roles;
   const [{ data: members }, { data: roles }, { data: guardians }, { data: staff }] = await Promise.all([
     p.sb.rpc('school_members'),
     p.sb.from('roles').select('key, name'),
@@ -78,7 +74,7 @@ export default async function People({ searchParams }: { searchParams: Promise<{
     p.can('payroll.prepare') ? p.sb.from('staff_members').select('id, employee_no, full_name, user_id').is('user_id', null).eq('status', 'active').order('full_name') : Promise.resolve({ data: [] }),
   ]);
   const roleName = (k: string) => p.tr(`people.roles.${k}`) || (roles ?? []).find((r) => r.key === k)?.name || k;
-  const pickable = ROLE_ORDER.filter((k) => (roles ?? []).some((r) => r.key === k));
+  const pickable = ROLE_ORDER.filter((k) => (roles ?? []).some((r) => r.key === k) && (adminOk || !ADMIN_ROLES.has(k)));
   const list = (members ?? []) as Member[];
   const site = process.env.NEXT_PUBLIC_SITE_URL ?? '';
 
@@ -94,7 +90,7 @@ export default async function People({ searchParams }: { searchParams: Promise<{
           <label>{p.tr('people.email')} <input name="email" type="email" required maxLength={200} autoComplete="off" className="ltr" /></label>
           <label>{p.tr('people.name')} <input name="name" required minLength={2} maxLength={120} /></label>
           <label>{p.tr('people.role')}
-            <select name="role" required defaultValue="parent">
+            <select name="role" required defaultValue="teacher">
               {pickable.map((k) => <option key={k} value={k}>{roleName(k)}</option>)}
             </select>
           </label>
@@ -115,6 +111,7 @@ export default async function People({ searchParams }: { searchParams: Promise<{
             </label>
           ) : null}
           <p className="muted">{p.tr('people.linkHint')}</p>
+          {!adminOk ? <p className="muted"><Link href="/portal/security">{p.tr('people.adminNeeds2fa')}</Link></p> : null}
           <button className="btn">{p.tr('people.inviteBtn')}</button>
         </form>
         <h3>{p.tr('people.tellThem')}</h3>

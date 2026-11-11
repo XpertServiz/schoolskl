@@ -29,11 +29,11 @@ export default function Home() {
   const load = useCallback(async () => {
     setErr(null);
     const since = new Date(Date.now() - 30 * 864e5).toISOString().slice(0, 10);
-    const { data: u } = await supabase.auth.getUser();
+    const { data: u } = await supabase.auth.getSession(); // local (cached) — no network round trip
     const [c, a, p] = await Promise.all([
       guardian ? supabase.from('students').select('id, full_name, admission_no').order('full_name') : Promise.resolve({ data: [], error: null }),
       guardian ? supabase.from('student_attendance').select('student_id, status').gte('att_date', since) : Promise.resolve({ data: [], error: null }),
-      u.user ? supabase.from('profiles').select('full_name').eq('user_id', u.user.id).maybeSingle() : Promise.resolve({ data: null }),
+      u.session?.user ? supabase.from('profiles').select('full_name').eq('user_id', u.session!.user.id).maybeSingle() : Promise.resolve({ data: null }),
     ]);
     if (c.error) setErr(c.error.message);
     setKids((c.data ?? []) as Child[]);

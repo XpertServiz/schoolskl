@@ -38,11 +38,20 @@ export default async function Cockpit({ searchParams }: { searchParams: Promise<
     setup = { done: steps.filter((s) => s.done).length, total: steps.length };
   }
 
+  // the four things a beginner does every day, one click away (each shown only if this person may do it)
+  const quick = ([
+    p.can('students.create') && { href: '/portal/students', label: p.tr('quick.addStudent') },
+    p.can('attendance.mark') && { href: '/portal/attendance', label: p.tr('quick.attendance') },
+    p.can('fees.collect') && { href: '/portal/fees', label: p.tr('quick.collect') },
+    (p.can('users.manage') || p.can('settings.manage')) && { href: '/portal/people', label: p.tr('quick.addPerson') },
+  ].filter(Boolean)) as { href: string; label: string }[];
+
   return (
     <>
       <h1>{p.tr('cockpit.title')}</h1>
       <p className="muted ltr">{c.date}</p>
       <Flash sp={sp} />
+      {quick.length ? <div className="quick">{quick.map((x) => <Link key={x.href} className="btn" href={x.href}>{x.label}</Link>)}</div> : null}
       {setup && setup.done < setup.total ? (
         <p role="status" className="notice"><Link href="/portal/setup">{p.tr('setup.banner', { done: setup.done, total: setup.total })}</Link></p>
       ) : null}

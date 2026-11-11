@@ -23,11 +23,11 @@ export function AnimatedSplash({ name }: { name: string }) {
       if (reduce) { setDone(true); return; }
       Animated.loop(Animated.timing(orbit, { toValue: 1, duration: 1600, easing: Easing.linear, useNativeDriver: true })).start();
       Animated.parallel([
-        Animated.timing(spin, { toValue: 1, duration: 2000, easing: Easing.bezier(0.16, 0.84, 0.3, 1), useNativeDriver: true }),
-        Animated.timing(text, { toValue: 1, duration: 500, delay: 1100, useNativeDriver: true }),
-        Animated.timing(bar, { toValue: 1, duration: 2000, delay: 200, easing: Easing.bezier(0.4, 0, 0.2, 1), useNativeDriver: true }),
+        Animated.timing(spin, { toValue: 1, duration: 1500, easing: Easing.bezier(0.16, 0.84, 0.3, 1), useNativeDriver: true }),
+        Animated.timing(text, { toValue: 1, duration: 400, delay: 800, useNativeDriver: true }),
+        Animated.timing(bar, { toValue: 1, duration: 1500, delay: 150, easing: Easing.bezier(0.4, 0, 0.2, 1), useNativeDriver: true }),
       ]).start(() => {
-        Animated.timing(out, { toValue: 0, duration: 450, useNativeDriver: true }).start(() => alive && setDone(true));
+        Animated.timing(out, { toValue: 0, duration: 350, useNativeDriver: true }).start(() => alive && setDone(true));
       });
     });
     return () => { alive = false; };

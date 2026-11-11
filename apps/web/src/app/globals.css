@@ -168,3 +168,5 @@ input[type='checkbox'], input[type='radio'] { accent-color: var(--accent); width
   .auth-visual h1, .auth-visual .lead { display: none; }
   .auth-campus { height: 13rem; margin-top: 1rem; }
 }
+.quick { display: flex; flex-wrap: wrap; gap: .6rem; margin: .25rem 0 1.25rem; }
+.quick .btn { padding: .7rem 1.1rem; }
