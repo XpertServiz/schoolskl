@@ -143,7 +143,7 @@
 #splash { position: fixed; inset: 0; z-index: 1000; display: grid; place-content: center; justify-items: center; gap: 1.1rem; background: var(--bg); pointer-events: none; overflow: hidden; animation: splash-out .6s ease 2.3s forwards; }
 html[data-splash='off'] #splash { display: none; }
 .sp-glow { position: absolute; width: 60vmax; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(color-mix(in srgb, var(--accent) 22%, transparent), transparent 60%); animation: sp-glow 2.4s ease forwards; }
-.sp-stage { position: relative; width: 150px; height: 138px; perspective: 700px; }
+.sp-stage { position: relative; width: 210px; height: 170px; perspective: 700px; }
 .sp-obj { animation: sp-spin 2s cubic-bezier(.16,.84,.3,1) forwards; }
 .sp-orbit { position: absolute; inset: -30% -40%; border-radius: 50%; border: 2px solid color-mix(in srgb, var(--accent) 55%, transparent); border-top-color: transparent; border-inline-start-color: transparent;
   transform: rotateX(72deg); animation: sp-orbit 1.6s linear infinite, m3d-in .4s ease forwards; opacity: 0; }

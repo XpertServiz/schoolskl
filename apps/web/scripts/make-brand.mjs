@@ -64,7 +64,7 @@ const out = await page.evaluate(async ({ src, BG }) => {
   const og = document.createElement('canvas'); og.width = 1200; og.height = 630; const gx = og.getContext('2d');
   const g = gx.createRadialGradient(600, 300, 40, 600, 315, 700); g.addColorStop(0, '#2c313a'); g.addColorStop(1, '#14171c'); gx.fillStyle = g; gx.fillRect(0, 0, 1200, 630);
   const s = Math.min(1040 / full.w, 540 / full.h); const dw = full.w * s, dh = full.h * s; gx.drawImage(base, full.x, full.y, full.w, full.h, (1200 - dw) / 2, (630 - dh) / 2, dw, dh);
-  o['web/src/app/opengraph-image.png'] = og.toDataURL('image/png');
+  o['web/src/app/opengraph-image.jpg'] = og.toDataURL('image/jpeg', 0.86);
   return { files: o, mark, full };
 }, { src, BG });
 await browser.close();
