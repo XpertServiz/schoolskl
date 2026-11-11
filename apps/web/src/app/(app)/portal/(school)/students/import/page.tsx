@@ -12,7 +12,7 @@ import { supabaseServer } from '@/lib/supabase/server';
 export const metadata = { title: 'Import students', robots: { index: false, follow: false } };
 const here = '/portal/students/import';
 const uuid = z.string().uuid();
-const ROW_ERRORS = ['class_unknown', 'section_unknown', 'section_required', 'name_required', 'guardian_required', 'phone_invalid', 'dob_invalid', 'gender_invalid', 'duplicate_in_file', 'already_on_file', 'no_current_session'];
+const ROW_ERRORS = ['class_unknown', 'class_ambiguous','section_unknown', 'section_required', 'name_required', 'guardian_required', 'phone_invalid', 'dob_invalid', 'gender_invalid', 'duplicate_in_file', 'already_on_file', 'no_current_session'];
 
 /**
  * Upload → the database checks every row (dry run) → a person reads the problems and either fixes the file or adds the students.

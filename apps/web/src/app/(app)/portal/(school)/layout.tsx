@@ -22,6 +22,7 @@ export default async function SchoolLayout({ children }: { children: React.React
     { href: '/portal', label: p.tr('nav.cockpit'), show: staff },
     { href: '/portal/approvals', label: p.tr('nav.approvals'), show: staff },
     { href: '/portal/family', label: p.tr('nav.myFamily'), show: p.access.is_guardian },
+    { href: '/portal/setup', label: p.tr('setup.nav'), show: p.can('settings.manage') },
   ];
   const groups: { label: string; items: Item[] }[] = [
     { label: p.tr('nav.group.people'), items: [

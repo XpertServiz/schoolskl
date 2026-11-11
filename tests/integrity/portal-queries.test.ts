@@ -63,6 +63,11 @@ const PAGE_QUERIES: Record<string, string> = {
   'timetable:slots': `select id, day_of_week, period_id, subject_id, teacher_id from public.timetable_slots`,
   'import:batches': `select id, status, summary, created_at from public.import_batches where entity = 'students' order by created_at desc limit 10`,
   'import:rows': `select row_no, raw, status, errors from public.import_rows order by row_no limit 2000`,
+  'setup:progress': `select public.setup_progress()`,
+  'setup:tenant': `select id, name, locale, branding from public.tenants`,
+  'setup:campuses': `select id, code, name, city from public.campuses where is_active order by code`,
+  'setup:sessions': `select id, name, starts_on, ends_on, is_current from public.academic_sessions order by starts_on desc`,
+  'setup:classes': `select id, name, level, campus_id from public.classes order by level`,
 };
 
 beforeAll(async () => {

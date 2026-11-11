@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Flash } from '@/components/flash';
 import { portal } from '@/lib/portal';
+import { setupSteps, type Progress } from '@/lib/setup';
 
 export const metadata = { title: 'Cockpit', robots: { index: false, follow: false } };
 
@@ -29,12 +30,22 @@ export default async function Cockpit({ searchParams }: { searchParams: Promise<
   if (p.access.is_guardian && !c.fees && !c.students && !c.attendance) {
     return <p><Link className="btn" href="/portal/family">{p.tr('nav.myFamily')}</Link></p>;
   }
+  // Only people who can change the school's setup see "finish setting up"; others never call setup_progress (it would refuse them).
+  let setup: { done: number; total: number } | null = null;
+  if (p.can('settings.manage')) {
+    const { data: pr } = await p.sb.rpc('setup_progress');
+    const steps = setupSteps((pr ?? {}) as Partial<Progress>, !p.mfaOff);
+    setup = { done: steps.filter((s) => s.done).length, total: steps.length };
+  }
 
   return (
     <>
       <h1>{p.tr('cockpit.title')}</h1>
       <p className="muted ltr">{c.date}</p>
       <Flash sp={sp} />
+      {setup && setup.done < setup.total ? (
+        <p role="status" className="notice"><Link href="/portal/setup">{p.tr('setup.banner', { done: setup.done, total: setup.total })}</Link></p>
+      ) : null}
       <div className="stats">
         <Stat label={p.tr('cockpit.approvals')} value={n(c.pending_approvals)} href="/portal/approvals" />
         {c.students ? <Stat label={p.tr('cockpit.students')} value={n(c.students.active)} href="/portal/students" /> : null}

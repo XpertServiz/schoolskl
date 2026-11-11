@@ -90,6 +90,26 @@
     "needSetup": "Add subjects and bell periods first.", "breakCell": "Break", "clashHint": "The system refuses a lesson that overlaps another lesson of the same section or the same teacher.",
     "days": { "1": "Mon", "2": "Tue", "3": "Wed", "4": "Thu", "5": "Fri", "6": "Sat", "7": "Sun" }
   },
+  "setup": {
+    "title": "Set up your school", "nav": "Setup", "intro": "Work through these steps once. You can come back and change things any time.",
+    "progress": "{done} of {total} steps done", "banner": "Finish setting up your school: {done} of {total} steps done.", "done": "Done", "todo": "To do", "optional": "Optional", "open": "Open", "saved": "Saved.",
+    "steps": {
+      "profile": { "title": "School details", "hint": "Shown on your school's public page and on printed challans." },
+      "campuses": { "title": "Campuses", "hint": "Most schools have one. Add another only if you run more than one branch." },
+      "session": { "title": "Academic year", "hint": "For example 2026-27. Students are enrolled into the current year." },
+      "classes": { "title": "Classes and sections", "hint": "Every student belongs to a class and a section." },
+      "fees": { "title": "Fees", "hint": "Fee heads and how much each class pays." },
+      "students": { "title": "Students", "hint": "Add one by one, or import your spreadsheet." },
+      "staff": { "title": "Staff", "hint": "Teachers and other staff, for attendance, timetable and payroll." },
+      "timetable": { "title": "Timetable", "hint": "Bell periods and who teaches what, when." },
+      "security": { "title": "Two-step sign-in", "hint": "Protects money and admin actions with a code from your phone." }
+    },
+    "profile": { "name": "School name", "tagline": "Short line under the name", "about": "About the school", "phone": "Phone", "address": "Address", "language": "Default language" },
+    "campus": { "code": "Code", "city": "City", "add": "Add campus" },
+    "session": { "name": "Name", "starts": "Starts on", "ends": "Ends on", "current": "Current", "makeCurrent": "Make current", "add": "Add academic year" },
+    "classes": { "name": "Class name", "level": "Order", "sections": "Sections", "addClass": "Add class", "addSection": "Add section", "none": "No classes yet.",
+      "standard": "Add the usual classes", "standardHint": "Adds Playgroup, Nursery, Prep and Class 1 to Class 10, each with section A. Classes that already exist are skipped." }
+  },
   "import": {
     "title": "Import students", "open": "Import from a spreadsheet",
     "intro": "Add many students at once from a spreadsheet. In Excel or Google Sheets choose File → Save as / Download → CSV. One row per child. Needed columns: student name, class, parent/guardian name, mobile. Optional: section, date of birth, gender.",
@@ -102,7 +122,7 @@
     "status": { "uploaded": "Uploaded", "dry_run_ok": "Ready to add", "dry_run_failed": "Has problems", "committed": "Added", "rolled_back": "Undone" },
     "err": {
       "noRows": "The file has no student rows.", "tooMany": "At most 2000 rows per file. Split the file and upload in parts.", "headers": "The file is missing these columns: {cols}", "file": "Choose a CSV file (up to 900 KB).",
-      "class_unknown": "Class not found. Use the class name exactly as it is in the system.", "section_unknown": "Section not found in this class.", "section_required": "This class has more than one section. Fill in the section.",
+      "class_unknown": "Class not found. Use the class name exactly as it is in the system.", "class_ambiguous": "This class name exists on more than one campus. Give the classes different names.", "section_unknown": "Section not found in this class.", "section_required": "This class has more than one section. Fill in the section.",
       "name_required": "Student name is missing.", "guardian_required": "Parent/guardian name is missing.", "phone_invalid": "Not a Pakistani mobile number (example: 0300 1234567).",
       "dob_invalid": "Date of birth should look like 2016-06-05 or 05/06/2016.", "gender_invalid": "Gender should be male, female or other.",
       "duplicate_in_file": "This child appears twice in the file.", "already_on_file": "This child is already in the system.", "no_current_session": "There is no current academic session. Set one up first."
