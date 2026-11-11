@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useState, type ReactNode } from 'react';
 import { sendCode, signInWithPassword, verifyCode, type LoginState } from './actions';
 
 /** Invisible to people (off-screen, not focusable, hidden from screen readers); bots that fill every field give themselves away. */
@@ -41,5 +41,35 @@ export function EmailCodeLogin({ labels }: { labels: { email: string; sendOtp: s
       {state.error ? <p role="alert" style={{ color: 'var(--danger)' }}>{labels.errors[state.error] ?? state.error}</p> : null}
       <button className="btn" disabled={sending || verifying}>{onCode ? labels.verify : labels.sendOtp}</button>
     </form>
+  );
+}
+
+/**
+ * The sign-in card: "Email code" / "Password" tabs, and a "New here?" panel. There is no open sign-up (DECISION: schools add people on
+ * their Logins page, so a stranger can never create an account); an invited parent or teacher "activates" by signing in with an email
+ * code, and a new school requests its account through the demo form.
+ */
+export function SignInCard({ code, password, labels }: {
+  code: ReactNode; password: ReactNode;
+  labels: { tabCode: string; tabPassword: string; newHere: string; activateBody: string; activate: string; newSchool: string; newSchoolBody: string; request: string; requestHref: string };
+}) {
+  const [tab, setTab] = useState<'code' | 'password'>('code');
+  return (
+    <>
+      <div className="seg" role="tablist">
+        <button type="button" role="tab" aria-selected={tab === 'code'} className={tab === 'code' ? 'on' : ''} onClick={() => setTab('code')}>✉ {labels.tabCode}</button>
+        <button type="button" role="tab" aria-selected={tab === 'password'} className={tab === 'password' ? 'on' : ''} onClick={() => setTab('password')}>🔑 {labels.tabPassword}</button>
+      </div>
+      {/* both panels are rendered (works before JavaScript loads); the inactive one is hidden */}
+      <div role="tabpanel" hidden={tab !== 'code'}>{code}</div>
+      <div role="tabpanel" hidden={tab !== 'password'}>{password}</div>
+      <div className="newhere">
+        <h2>{labels.newHere}</h2>
+        <p className="muted">{labels.activateBody}</p>
+        <button type="button" className="btn secondary" onClick={() => setTab('code')}>{labels.activate}</button>
+        <p className="muted" style={{ marginTop: '.9rem' }}><b>{labels.newSchool}</b> {labels.newSchoolBody}</p>
+        <a className="btn secondary" href={labels.requestHref}>{labels.request}</a>
+      </div>
+    </>
   );
 }

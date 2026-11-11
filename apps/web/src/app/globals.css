@@ -142,3 +142,29 @@ input[type='checkbox'], input[type='radio'] { accent-color: var(--accent); width
 @media (prefers-reduced-motion: reduce) { .pl-obj, .pl-dots i { animation: none; } }
 .navload { position: fixed; inset: 0; z-index: 900; display: grid; place-items: center; background: color-mix(in srgb, var(--bg, #0F1419) 55%, transparent); backdrop-filter: blur(3px); }
 .navload .pl { min-height: 0; }
+
+/* ---- sign-in: night sky + rising campus beside a glass card (portal/login) */
+.auth-split { min-height: 100vh; display: grid; grid-template-columns: 1.15fr 1fr; background: #02040b; }
+.auth-visual { position: relative; overflow: hidden; isolation: isolate; display: flex; flex-direction: column; padding: 2rem clamp(1.5rem, 4vw, 3.5rem) 0; text-align: start; }
+.auth-visual-in { position: relative; z-index: 1; max-width: 34rem; }
+.auth-visual h1 { font-size: clamp(2rem, 4.2vw, 3.4rem); margin: 1.6rem 0 .6rem; max-width: 14ch; line-height: 1.05; }
+.auth-visual .lead { color: var(--ink-2); font-size: 1.1rem; margin: 0; }
+.auth-campus { position: relative !important; inset: auto !important; margin-top: auto; height: clamp(16rem, 42vh, 26rem); border-radius: 32px 32px 0 0; }
+.auth-panel { display: grid; place-items: center; padding: 2rem 1.25rem; background: radial-gradient(80% 60% at 70% 0%, rgba(245,165,36,.10), transparent 70%), #070d18; }
+.auth-card.glass { width: min(27rem, 100%); padding: 1.6rem; border-radius: 24px; border: 1px solid var(--line-slate); background: rgba(22,31,41,.78); backdrop-filter: blur(14px); box-shadow: 0 40px 90px -40px #000; }
+.auth-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+.auth-top .auth-brand { justify-items: start; text-align: start; }
+.auth-top .auth-brand svg { width: 44px; height: 44px; }
+.seg { display: flex; gap: .3rem; padding: .3rem; border-radius: 14px; background: #0b1016; border: 1px solid var(--line-slate); }
+.seg button { flex: 1; padding: .6rem; border-radius: 10px; border: 1px solid transparent; background: none; color: var(--ink-2); font: inherit; font-weight: 700; cursor: pointer; }
+.seg button.on { background: var(--surface-2, #1c2733); color: var(--ink); border-color: var(--line-slate); }
+.newhere { border-top: 1px solid var(--line-slate); padding-top: 1rem; display: grid; gap: .45rem; }
+.newhere h2 { margin: 0; font-size: 1.1rem; }
+.newhere p { margin: 0; font-size: .92rem; }
+.newhere .btn { width: 100%; text-align: center; }
+@media (max-width: 56rem) {
+  .auth-split { grid-template-columns: 1fr; }
+  .auth-visual { min-height: 0; padding-top: 1.25rem; }
+  .auth-visual h1, .auth-visual .lead { display: none; }
+  .auth-campus { height: 13rem; margin-top: 1rem; }
+}
