@@ -92,6 +92,18 @@ describe('tenant lifecycle guards', () => {
     expect((await host('school-a.ilmora.pk')).rows).toEqual([{ slug: 'school-a' }]);
   });
 
+  it('path routing: a bare slug resolves to the same public row; churned schools, unknown slugs and dotted junk do not', async () => {
+    const host = (h: string) => q<{ slug: string; name: string }>(db, null, `select slug, name from public.resolve_tenant($1)`, [h], 'anon');
+    expect((await host('school-a')).rows.map((r) => r.slug)).toEqual(['school-a']);
+    expect((await host('SCHOOL-A')).rows.map((r) => r.slug)).toEqual(['school-a']);
+    expect((await host('no-such-school')).rows).toEqual([]);
+    expect((await host('school-a.evil.example')).rows).toEqual([]); // a dotted value is a host: only verified domains match
+    await admin(db, `update public.tenants set status = 'churned' where id = $1`, [w.tenantB]);
+    const slugB = (await admin<{ slug: string }>(db, `select slug from public.tenants where id = $1`, [w.tenantB])).rows[0]!.slug;
+    expect((await host(slugB)).rows).toEqual([]);
+    await admin(db, `update public.tenants set status = 'live' where id = $1`, [w.tenantB]);
+  });
+
   it('my_tenants lists only the caller’s memberships; set_active_tenant refuses strangers', async () => {
     expect((await q(db, w.as(ids.parentAB, null), `select * from public.my_tenants()`)).rows).toHaveLength(2);
     expect((await q(db, w.as(ids.outsider, null), `select * from public.my_tenants()`)).rows).toHaveLength(0);

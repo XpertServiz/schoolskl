@@ -4,6 +4,7 @@ import { t, type Locale } from '@ilmora/i18n';
 import { Icons } from '@/components/landing/icons';
 import { Splash } from '@/components/landing/Splash';
 import { setLocale } from '@/lib/locale-action';
+import { portalLoginUrl } from '@/lib/urls';
 import '../landing.css';
 
 // DECISION: the brand is never hard-coded; it comes from the same env var as the root layout until the Vendor Console has Brand settings.
@@ -29,6 +30,7 @@ export default async function MarketingLayout({ children }: { children: React.Re
             <input type="hidden" name="back" value="/" />
             <button className="l-lang" lang={locale === 'ur' ? 'en' : 'ur'}>{tr('nav.language')}</button>
           </form>
+          <a href={portalLoginUrl()} className="l-signin">{tr('auth.signIn')}</a>
           <Link href="/demo" className="b b-primary">{tr('marketing.nav.demo')}</Link>
         </div>
       </header>

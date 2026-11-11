@@ -21,6 +21,15 @@ export async function middleware(req: NextRequest) {
 
   switch (k.kind) {
     case 'root':
+      // Path routing (NEXT_PUBLIC_ROUTING=path, e.g. on a *.vercel.app address with no subdomains): the portal, the vendor console and
+      // school sites share the root host. Same pages, same session refresh, same database checks — only the address shape differs.
+      if (process.env.NEXT_PUBLIC_ROUTING === 'path') {
+        if (pathname === '/portal' || pathname.startsWith('/portal/') || pathname === '/vendor' || pathname.startsWith('/vendor/')) {
+          return refreshSession(req, NextResponse.next());
+        }
+        const site = /^\/s\/([a-z0-9][a-z0-9-]{1,61}[a-z0-9])(\/.*)?$/.exec(pathname);
+        if (site) return rewrite(req, `/site/${site[1]}${site[2] ?? ''}`, search); // the page resolves the bare slug
+      }
       if (!internal) return NextResponse.next();
       // DECISION: internal prefixes on the root host get a small static 404 page, not a rewrite to the rendered /not-found route.
       // When a server action redirects, Next pre-renders the target with an internal fetch to the server's own origin (`next start` →

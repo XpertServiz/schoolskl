@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import { t, type Locale } from '@ilmora/i18n';
 import { Icons } from '@/components/landing/icons';
 import { PhoneMock } from '@/components/landing/PhoneMock';
+import { portalLoginUrl } from '@/lib/urls';
 
 export const metadata = { title: 'Apps' };
 
@@ -13,10 +14,7 @@ export const metadata = { title: 'Apps' };
 export default async function Apps() {
   const locale: Locale = (await cookies()).get('locale')?.value === 'ur' ? 'ur' : 'en';
   const tr = (k: string, v?: Record<string, string | number>) => t(locale, k, v);
-  const root = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'localhost';
-  const proto = root === 'localhost' ? 'http' : 'https';
-  const port = root === 'localhost' ? ':3000' : '';
-  const webApp = `${proto}://app.${root}${port}/portal/login`;
+  const webApp = portalLoginUrl();
   return (
     <div className="l-wrap l-section">
       <h1 style={{ fontSize: 'clamp(2rem,5vw,3.2rem)' }}>{tr('marketing.appsPage.title')}</h1>

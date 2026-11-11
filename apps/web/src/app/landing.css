@@ -16,6 +16,8 @@ html[lang='ur'] .l-section > h2, html[lang='ur'] .l-head { letter-spacing: 0; li
 .l-nav a:hover { color: var(--ink); border-bottom-color: var(--accent); }
 .l-lang { background: none; border: 1px solid var(--line-slate); color: var(--ink); border-radius: 999px; padding: .35rem .9rem; cursor: pointer; font: inherit; }
 .l-lang:hover { border-color: var(--accent); }
+.l-signin { color: var(--ink); text-decoration: none; padding: .35rem .5rem; white-space: nowrap; }
+.l-signin:hover { color: var(--accent); }
 
 /* ---- buttons */
 .b { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 3rem; padding: .7rem 1.4rem; border-radius: 14px; font: inherit; font-weight: 700; text-decoration: none; border: 1px solid transparent; cursor: pointer; transition: transform .15s ease, box-shadow .15s ease, background .15s ease; }

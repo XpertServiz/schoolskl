@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { t } from '@ilmora/i18n';
 import { resolveTenant } from '@/lib/tenant';
+import { portalLoginUrl } from '@/lib/urls';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,15 +16,13 @@ export default async function TenantHome({ params }: { params: Promise<{ host: s
   const host = decodeURIComponent((await params).host);
   const tenant = await resolveTenant(host);
   if (!tenant) notFound(); // unknown / unverified host → 404, never another school's page
-  const root = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? 'localhost';
-  const proto = root === 'localhost' ? 'http' : 'https';
   const b = tenant.branding ?? {};
   const tagline = text(b.tagline, 160), about = text(b.about, 1500), phone = text(b.phone, 30), address = text(b.address, 200);
   return (
     <div className="wrap" lang={tenant.locale} dir={tenant.locale === 'ur' ? 'rtl' : 'ltr'}>
       <h1>{tenant.name}</h1>
       {tagline ? <p className="muted" style={{ fontSize: '1.15rem' }}>{tagline}</p> : null}
-      <p><a className="btn" href={`${proto}://app.${root}/portal/login`}>{t(tenant.locale, 'auth.signIn')}</a></p>
+      <p><a className="btn" href={portalLoginUrl()}>{t(tenant.locale, 'auth.signIn')}</a></p>
       {about ? <section className="card"><p style={{ whiteSpace: 'pre-line', margin: 0 }}>{about}</p></section> : null}
       {phone || address ? (
         <p className="muted">{address}{address && phone ? ' · ' : ''}{phone ? <span className="ltr">{phone}</span> : null}</p>
