@@ -26,7 +26,7 @@ export async function sendCode(_: LoginState, form: FormData): Promise<LoginStat
 }
 
 export async function verifyCode(prev: LoginState, form: FormData): Promise<LoginState> {
-  const code = z.string().trim().regex(/^\d{6}$/).safeParse(form.get('code'));
+  const code = z.string().trim().regex(/^\d{6,8}$/).safeParse(form.get('code'));
   if (!code.success || !prev.email) return { ...prev, step: 'code', error: 'auth.err.badCode' };
   const sb = await supabaseServer();
   const { error } = await sb.auth.verifyOtp({ email: prev.email, token: code.data, type: 'email' });

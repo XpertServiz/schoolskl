@@ -25,7 +25,7 @@ export default function Login() {
     setSentTo(address);
   }
   async function verify() {
-    if (!sentTo || !/^\d{6}$/.test(code.trim())) return setErr(tr('auth.err.badCode'));
+    if (!sentTo || !/^\d{6,8}$/.test(code.trim())) return setErr(tr('auth.err.badCode'));
     setBusy(true); setErr(null);
     const { error } = await supabase.auth.verifyOtp({ email: sentTo, token: code.trim(), type: 'email' });
     setBusy(false);
@@ -52,7 +52,7 @@ export default function Login() {
         {sentTo ? (
           <>
             <Muted>{tr('auth.emailCodeSent')}</Muted>
-            <TextInput style={s.input} value={code} onChangeText={setCode} keyboardType="number-pad" maxLength={6} autoComplete="sms-otp" textContentType="oneTimeCode" accessibilityLabel={tr('auth.code')} placeholder={tr('auth.code')} placeholderTextColor="#667" />
+            <TextInput style={s.input} value={code} onChangeText={setCode} keyboardType="number-pad" maxLength={8} autoComplete="sms-otp" textContentType="oneTimeCode" accessibilityLabel={tr('auth.emailCode')} placeholder={tr('auth.emailCode')} placeholderTextColor="#667" />
             <Button label={tr('auth.verify')} onPress={verify} disabled={busy} />
             <Button label={tr('common.cancel')} onPress={() => { setSentTo(null); setCode(''); setErr(null); }} secondary />
           </>

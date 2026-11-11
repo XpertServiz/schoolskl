@@ -27,7 +27,7 @@ export function EmailCodeLogin({ labels }: { labels: { email: string; sendOtp: s
       {onCode ? (
         <>
           <p className="muted" style={{ margin: 0 }}>{labels.sent}</p>
-          <label>{labels.code}<input name="code" inputMode="numeric" autoComplete="one-time-code" pattern="\d{6}" required dir="ltr" /></label>
+          <label>{labels.code}<input name="code" inputMode="numeric" autoComplete="one-time-code" pattern="\d{6,8}" required dir="ltr" /></label>
         </>
       ) : (
         <label>{labels.email}<input name="email" type="email" autoComplete="email" required dir="ltr" /></label>
