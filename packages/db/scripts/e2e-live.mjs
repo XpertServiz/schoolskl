@@ -91,6 +91,43 @@ const ownerT = s2.access_token ?? s1.access_token;
   ok('P&L has income lines (aal1 owner may read reports)', pl.status === 200 && pl.body.some((x) => Number(x.amount) > 0), pl.status !== 200 ? JSON.stringify(pl.body).slice(0, 100) : '');
 }
 
+// ---- SafeRoute (needs dev-saferoute.mjs): driver phone → bus position → QR scan → parent sees the bus
+const dEmail = 'driver@noor-academy.test';
+if (pw(dEmail)) {
+  const d = await auth({ email: dEmail, password: pw(dEmail) }, 'password');
+  const par = await auth({ email: 'parent@noor-academy.test', password: pw('parent@noor-academy.test') }, 'password');
+  if (ok('driver signs in', !!d.access_token)) {
+    const acc = await call(d.access_token, 'my_access');
+    ok('driver is crew and the school has saferoute on', acc.body?.is_crew === true && acc.body?.flags?.includes('saferoute'));
+    const routes = await call(d.access_token, 'my_transport_routes');
+    const r1 = routes.body?.find?.((x) => x.name === 'Route 1');
+    ok('driver sees Route 1 with its riders', !!r1 && r1.riders >= 4, JSON.stringify(routes.body)?.slice(0, 120));
+    const trip = (await call(d.access_token, 'start_trip', { p_route: r1?.route_id, p_direction: 'to_school' })).body;
+    ok('driver starts a trip', typeof trip === 'string');
+    const posted = await call(d.access_token, 'post_trip_positions', { p_trip: trip, p_points: [{ lat: 31.4834, lng: 74.3256, accuracy: 10, at: new Date().toISOString() }] });
+    ok('driver phone posts a bus position', posted.status === 200 && posted.body === 1, JSON.stringify(posted.body));
+    const cards = (await call(s1.access_token, 'route_cards', { p_route: r1?.route_id })).body ?? [];
+    const card = (n) => cards.find?.((x) => x.full_name === n)?.token;
+    const bilal = await call(d.access_token, 'scan_transport_card', { p_trip: trip, p_code: `SR1:${card('Bilal Khan')}` });
+    ok('scanning a child without parent consent is refused and not recorded', bilal.body?.result === 'no_consent', JSON.stringify(bilal.body));
+    const amna = await call(d.access_token, 'scan_transport_card', { p_trip: trip, p_code: `SR1:${card('Amna Khan')}` });
+    ok('scanning Amna (consented) records boarding', ['boarded', 'duplicate'].includes(amna.body?.result), JSON.stringify(amna.body));
+    const cards2 = await call(d.access_token, 'route_cards', { p_route: r1?.route_id });
+    ok('the driver cannot print or read cards', cards2.status >= 400);
+    if (par.access_token) {
+      const st = (await call(par.access_token, 'my_bus_status')).body ?? [];
+      const a = st.find?.((x) => x.first_name === 'Amna');
+      ok('parent sees the bus on the map for Amna', a?.trip_id === trip && Math.abs(a?.lat - 31.4834) < 1e-6, JSON.stringify(a)?.slice(0, 160));
+      const b = st.find?.((x) => x.first_name === 'Bilal');
+      ok('…but not for Bilal (no consent given)', !!b && b.consent === false && b.lat === null);
+      const pos = await table(par.access_token, 'transport_positions', 'select=id');
+      ok('a parent cannot read the positions table directly', pos.status === 200 && pos.body.length === 0);
+    }
+    const end = await call(d.access_token, 'end_trip', { p_trip: trip });
+    ok('driver ends the trip', end.status === 200 && end.body?.ended === true, JSON.stringify(end.body));
+  }
+} else console.log('INFO  no driver login yet — run node packages/db/scripts/dev-saferoute.mjs');
+
 // ---- vendor admin
 const vEmail = 'vendor.admin@xpertserviz.test';
 const v = await auth({ email: vEmail, password: pw(vEmail) }, 'password');

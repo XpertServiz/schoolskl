@@ -58,6 +58,12 @@ const PAGE_QUERIES: Record<string, string> = {
   'timetable:subjects': `select id, code, name from public.subjects where is_active order by name`,
   'timetable:periods': `select id, campus_id, name, starts_at, ends_at, sort_order, is_break from public.periods order by sort_order, starts_at`,
   'timetable:classes': `select id, name, level, campus_id from public.classes order by level`,
+  transport: `select id, name, vehicle_label, driver_staff_id, attendant_staff_id, is_active from public.transport_routes order by name`,
+  'transport:riders': `select student_id, route_id, stop_name from public.transport_riders`,
+  'transport:staff': `select id, full_name, user_id, status from public.staff_members where status = 'active' order by full_name`,
+  'transport:students': `select id, full_name, admission_no from public.students where status = 'enrolled' order by full_name`,
+  'transport:live': `select trip_id, route_name, vehicle_label, direction, lat, lng, position_at, riders, on_board from public.live_trips()`,
+  'family:bus': `select student_id, first_name, route_name, vehicle_label, stop_name, consent, saferoute_on, trip_id, direction, trip_started_at, last_event, last_event_at, lat, lng, accuracy_m, position_at from public.my_bus_status()`,
   'timetable:sections': `select id, class_id, name from public.sections order by name`,
   'timetable:staff': `select id, full_name from public.staff_members where status = 'active' order by full_name`,
   'timetable:slots': `select id, day_of_week, period_id, subject_id, teacher_id from public.timetable_slots`,
@@ -175,6 +181,22 @@ describe('staff and timetable screens (the writes the pages make, as the roles t
     // and the owner can remove it
     await q(db, s.owner, `delete from public.timetable_slots where id = $1`, [slot]);
     expect((await q(db, s.owner, PAGE_QUERIES['timetable:slots']!)).rows).toEqual([]);
+  });
+});
+
+describe('transport screens (as the roles that open them)', () => {
+  it('owner adds a route and a rider the way the page does; the parent sees the rider row for their own child only, and the bus status', async () => {
+    const route = (await q<{ id: string }>(db, s.owner, `insert into public.transport_routes (tenant_id, name, vehicle_label) values ($1,'Page route','LEA-1') returning id`, [s.tenant])).rows[0]!.id;
+    // the page's upsert (one route per child) — insert, then the same child again to another route
+    await q(db, s.owner, `insert into public.transport_riders (tenant_id, student_id, route_id, stop_name) values ($1,$2,$3,'Stop A') on conflict (tenant_id, student_id) do update set route_id = excluded.route_id, stop_name = excluded.stop_name`, [s.tenant, s.students[0], route]);
+    await q(db, s.owner, `insert into public.transport_riders (tenant_id, student_id, route_id, stop_name) values ($1,$2,$3,'Stop A') on conflict (tenant_id, student_id) do update set route_id = excluded.route_id, stop_name = excluded.stop_name`, [s.tenant, s.students[2], route]);
+    expect((await q(db, s.parent, PAGE_QUERIES['transport:riders']!)).rows).toHaveLength(1); // Amna, not Zara
+    expect((await q(db, s.cashier, PAGE_QUERIES['transport:riders']!)).rows).toHaveLength(0);
+    await expect(q(db, s.cashier, `insert into public.transport_routes (tenant_id, name) values ($1,'Nope')`, [s.tenant])).rejects.toThrow(/row-level security|permission denied/);
+    const bus = (await q<{ first_name: string; saferoute_on: boolean; consent: boolean }>(db, s.parent, PAGE_QUERIES['family:bus']!)).rows;
+    expect(bus).toEqual([expect.objectContaining({ first_name: 'Amna', saferoute_on: false, consent: false })]);
+    expect((await q(db, other.owner, PAGE_QUERIES.transport!)).rows.filter((r) => r.name === 'Page route')).toHaveLength(0);
+    await expect(q(db, s.cashier, PAGE_QUERIES['transport:live']!)).rejects.toThrow(/permission denied/);
   });
 });
 

@@ -1,11 +1,15 @@
 import Link from 'next/link';
+import { Flash } from '@/components/flash';
+import type { BusStatus } from '@/lib/bus';
 import { portal } from '@/lib/portal';
+import { BusSection } from './bus-section';
 
 export const metadata = { title: 'My family', robots: { index: false, follow: false } };
 
 /** The parent's view. Every query is plain RLS: a guardian can only ever read their own family's children, vouchers and published results. */
-export default async function Family() {
+export default async function Family({ searchParams }: { searchParams: Promise<{ ok?: string; err?: string }> }) {
   const p = await portal();
+  const sp = await searchParams;
   const { data: students } = await p.sb.from('students').select('id, full_name, admission_no, family_id').order('full_name');
   const ids = (students ?? []).map((s) => s.id);
   const [{ data: vouchers }, { data: results }, { data: exams }, { data: att }] = ids.length
@@ -17,10 +21,13 @@ export default async function Family() {
       ])
     : [{ data: [] }, { data: [] }, { data: [] }, { data: [] }];
   const exam = new Map((exams ?? []).map((e) => [e.id as string, e.name as string]));
+  const { data: busRows } = ids.length ? await p.sb.rpc('my_bus_status') : { data: [] };
+  const bus = new Map(((busRows ?? []) as BusStatus[]).map((b) => [b.student_id, b]));
 
   return (
     <>
       <h1>{p.tr('family.title')}</h1>
+      <Flash sp={sp} />
       {(students ?? []).length === 0 ? <p className="muted">{p.tr('ui.empty')}</p> : null}
       {(students ?? []).map((s) => {
         const vs = (vouchers ?? []).filter((v) => v.student_id === s.id);
@@ -50,6 +57,8 @@ export default async function Family() {
 
             <h3>{p.tr('family.attendance')}</h3>
             <p className="ltr">{days.length ? `${present}/${days.length}` : '—'}</p>
+
+            {bus.has(s.id) ? <BusSection p={p} b={bus.get(s.id)!} back="/portal/family" /> : null}
           </section>
         );
       })}

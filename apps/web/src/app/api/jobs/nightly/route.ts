@@ -22,5 +22,8 @@ export async function POST(req: Request) {
     const { data, error: e } = await sb.rpc('run_nightly', { p_tenant: t.id, p_as_of: null });
     if (e) { failed++; results[t.slug] = { error: e.message }; } else results[t.slug] = data;
   }
-  return NextResponse.json({ ok: failed === 0, schools: tenants?.length ?? 0, failed, results }, { status: failed ? 207 : 200 });
+  // SafeRoute retention: bus positions older than 30 days go; trips a dead phone left open are closed (all schools, one call)
+  const { data: purged, error: pe } = await sb.rpc('purge_transport_positions', { p_days: 30 });
+  if (pe) failed++;
+  return NextResponse.json({ ok: failed === 0, schools: tenants?.length ?? 0, failed, results, transport: pe ? { error: pe.message } : { purged } }, { status: failed ? 207 : 200 });
 }

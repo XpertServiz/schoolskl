@@ -9,15 +9,23 @@
     "icon": "./assets/icon.png",
     "backgroundColor": "#23303A",
     "splash": { "image": "./assets/splash-icon.png", "resizeMode": "contain", "backgroundColor": "#23303A" },
-    "plugins": ["expo-router"],
+    "plugins": [
+      "expo-router",
+      ["expo-location", {
+        "locationWhenInUsePermission": "Used only on the Drive screen while a school bus trip is running, so parents can see where the bus is.",
+        "isAndroidBackgroundLocationEnabled": false, "isIosBackgroundLocationEnabled": false
+      }],
+      ["expo-camera", { "cameraPermission": "Used only to scan children's bus cards (QR codes) on the Drive screen.", "microphonePermission": false, "recordAudioAndroid": false }]
+    ],
     "experiments": { "typedRoutes": false },
     "ios": { "supportsTablet": false, "bundleIdentifier": "pk.example.school" },
     "android": {
       "package": "pk.example.school",
-      "permissions": [],
+      "permissions": ["android.permission.ACCESS_COARSE_LOCATION", "android.permission.ACCESS_FINE_LOCATION", "android.permission.CAMERA"],
+      "blockedPermissions": ["android.permission.ACCESS_BACKGROUND_LOCATION", "android.permission.RECORD_AUDIO"],
       "adaptiveIcon": { "foregroundImage": "./assets/adaptive-icon.png", "backgroundColor": "#23303A" }
     },
     "web": { "bundler": "metro", "output": "single", "favicon": "./assets/favicon.png" },
-    "extra": { "note": "App name, bundle ids and artwork are placeholders until the product name is decided (open question 1); regenerate artwork with apps/web/scripts/make-icons.mjs. No location, camera or microphone permission is requested." }
+    "extra": { "note": "App name, bundle ids and artwork are placeholders until the product name is decided (open question 1); regenerate artwork with apps/web/scripts/make-icons.mjs. Location (foreground only) and camera are requested only on the Drive screen, for bus trips and bus-card scanning; background location and the microphone are blocked." }
   }
 }

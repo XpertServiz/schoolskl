@@ -4,6 +4,32 @@
   "auth": { "signIn": "Sign in", "phone": "Mobile number", "sendOtp": "Send code", "code": "6-digit code", "verify": "Verify", "chooseSchool": "Choose your school", "or": "or", "withPhone": "With your mobile number", "withEmail": "With email and password", "email": "Email", "password": "Password", "emailCode": "Code from your email", "emailCodeSent": "We sent a code to your email. It expires in a few minutes.", "err": { "fields": "Enter your email and password.", "wrong": "Email or password is incorrect.", "badEmail": "Enter a valid email address.", "sendFailed": "We could not send a code to that email.", "badCode": "Enter the code from your email.", "wrongCode": "That code is wrong or has expired." } },
   "vendor": { "leads": "Demo requests", "handled": "Handled", "markHandled": "Mark handled", "console": "Vendor Console", "plans": "Plans", "flags": "Feature flags", "contactUs": "Contact us", "legalRef": "Written legal opinion reference", "legalMissing": "No legal opinion on record — cannot be switched on", "on": "On", "off": "Off", "turnOn": "Turn on", "turnOff": "Turn off", "tenants": "Schools", "slug": "School address (e.g. noor-academy)", "schoolName": "School name", "create": "Create school", "reason": "Why do you need access? (min 10 characters)", "ticket": "Support ticket", "impersonate": "Start support session (30 min, audited)", "supportOff": "This school has turned off support access." },
   "tenant": { "notFound": "We couldn't find this school.", "suspended": "This school's account is read-only. Please contact the school office." },
+  "transport": {
+    "nav": "Transport", "title": "School transport", "off": "Bus tracking is not switched on for this school yet. Ask your account manager to turn on SafeRoute.",
+    "how": "The driver's phone shares the bus location during a trip. Children show a printed QR card when they get on and off. Parents see the bus only if they agree.",
+    "routes": "Routes", "addRoute": "Add route", "routeName": "Route name", "vehicle": "Vehicle number", "driver": "Driver", "attendant": "Attendant", "none": "— none —",
+    "riders": "Children on this route", "addRider": "Add child", "stop": "Stop", "remove": "Remove", "save": "Save",
+    "cards": "Print QR cards", "reissue": "Re-issue all cards (old cards stop working)", "cardsTitle": "Bus cards — {route}", "cardHint": "Cut out each card and give it to the child. If a card is lost, re-issue the cards.",
+    "live": "Live buses", "noLive": "No bus is on a trip right now.", "onBoard": "{n} of {total} on board", "updated": "Updated {time}", "noFix": "No location yet",
+    "dir": { "to_school": "To school", "to_home": "To home" },
+    "saved": "Saved", "driverHint": "The driver needs a staff record linked to their login (Staff page).", "notCrew": "You are not assigned to a route.",
+    "family": {
+      "bus": "School bus", "consentQ": "Show me where the bus is, and record when {name} gets on and off.", "consentOn": "You agreed. You can withdraw at any time.",
+      "consentOff": "You have not agreed. The school does not record when {name} gets on or off the bus.", "give": "I agree", "withdraw": "Withdraw consent",
+      "noTrip": "The bus is not on a trip right now.", "boarded": "{name} got on the bus at {time}", "alighted": "{name} got off the bus at {time}",
+      "onTheWay": "The bus is on its way", "openMap": "Open live map", "hidden": "The map is hidden once your child is off the bus.", "refresh": "This page refreshes by itself."
+    },
+    "drive": {
+      "title": "Drive", "pick": "Choose your route", "start": "Start trip", "end": "End trip", "sharing": "Sharing bus location", "notSharing": "Location is off",
+      "permission": "Allow location so parents can see the bus. It is used only while a trip is running.", "scan": "Scan card", "scanHint": "Point the camera at the child's bus card.",
+      "cameraPermission": "Allow the camera to scan bus cards.", "close": "Close", "list": "Children", "board": "Got on", "alight": "Got off", "keepOpen": "Keep this screen open during the trip.",
+      "pending": "{n} location point(s) waiting to send", "stillOnBoard": "{n} child(ren) still marked on board. Check the bus before leaving it.",
+      "result": {
+        "boarded": "{name} got on", "alighted": "{name} got off", "duplicate": "{name} already scanned", "unknown_card": "This card is not valid. Mark the child by hand.",
+        "not_on_route": "{name} is not on this bus's list!", "no_consent": "{name}: no parent consent — not recorded"
+      }
+    }
+  },
   "notify": {
     "absent": "{school}: {student} was marked absent from school today ({date}).",
     "feeReminder": {
@@ -138,7 +164,7 @@
     "fees": { "payWith": "Pay at any bank or in your banking app using this consumer number:", "copy": "Copy number", "copied": "Copied" },
     "results": { "open": "View report card" },
     "att": { "noRoster": "This class list has not been downloaded yet. Connect to the internet once to load it.", "queued": "Saved on this phone. It will be sent when you are online.", "waiting": "{count} register(s) waiting to be sent", "syncNow": "Send now", "dismiss": "Dismiss", "hint": "Tap a child to change: present, absent, late, on leave." },
-    "more": { "signedIn": "Signed in", "privacy": "This app does not use your location, camera or microphone." }
+    "more": { "signedIn": "Signed in", "privacy": "This app uses your location only on the Drive screen while a bus trip is running, and the camera only to scan bus cards. It never uses the microphone." }
   },
   "plan": { "notIncluded": "This feature is not part of your school's plan. Please contact your account manager." },
   "marketing": {

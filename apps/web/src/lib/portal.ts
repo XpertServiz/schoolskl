@@ -9,7 +9,11 @@ export interface Access {
   tenant: { id: string; name: string; status: string; locale: Locale; currency: string; timezone: string };
   permissions: string[];
   features: string[];
+  /** feature flags switched on for this school (e.g. saferoute) */
+  flags?: string[];
   is_guardian: boolean;
+  /** driver or attendant on an active route */
+  is_crew?: boolean;
 }
 
 export async function getLocale(): Promise<Locale> {
@@ -40,6 +44,7 @@ export async function portal() {
     can: (key: string) => perms.has(key),
     // DECISION: an empty feature list means "no plan on file" (vendor-managed tenant) and is treated as everything-on, like app.plan_has_feature.
     has: (feature: string) => feats.size === 0 || feats.has(feature),
+    flag: (key: string) => (access.flags ?? []).includes(key),
     tr: (key: string, vars: Record<string, string | number> = {}) => t(locale, key, vars),
     fmt: (minor: number | string | bigint | null | undefined) => formatMoney(money(BigInt(Math.trunc(Number(minor ?? 0))), access.tenant.currency), fmtLocale),
   };

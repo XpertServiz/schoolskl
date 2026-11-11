@@ -30,6 +30,7 @@ export default async function SchoolLayout({ children }: { children: React.React
       { href: '/portal/attendance', label: p.tr('nav.attendance'), show: p.can('attendance.mark') || p.can('attendance.view') },
       { href: '/portal/staff', label: p.tr('nav.staff'), show: p.access.permissions.length > 0 }, // the page itself narrows to "my check-in" for plain staff
       { href: '/portal/admissions', label: p.tr('nav.admissions'), show: p.has('admissions_crm') && p.can('admissions.manage') },
+      { href: '/portal/transport', label: p.tr('transport.nav'), show: p.can('transport.manage') || p.can('tracking.live.view') },
     ] },
     { label: p.tr('nav.group.money'), items: [
       { href: '/portal/fees', label: p.tr('nav.fees'), show: p.can('fees.view') || p.can('fees.collect') },

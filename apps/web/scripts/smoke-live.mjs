@@ -90,5 +90,17 @@ await page('the root host never serves the vendor console', 'localhost', '/vendo
 await page('STUDENT IMPORT page renders for the owner', A, '/portal/students/import', owner, { text: ['Import students', 'Upload and check', 'Download an example file'] });
 await page('TEACHER cannot open student import', A, '/portal/students/import', teacher, { status: 307, loc: '/portal' });
 
+// SafeRoute (needs packages/db/scripts/dev-saferoute.mjs)
+await page('TRANSPORT page: routes, riders, cards link for the owner', A, '/portal/transport', owner, { text: ['School transport', 'Route 1', 'LES-1234', 'Amna Khan', 'Print QR cards', 'Live buses'] });
+await page('MENU shows Transport to the owner', A, '/portal', owner, { text: ['/portal/transport'] });
+await page('TEACHER cannot open transport', A, '/portal/transport', teacher, { status: 307, loc: '/portal' });
+const route1 = /href="\/portal\/transport\/cards\/([0-9a-f-]{36})"/.exec((await new Promise((res) => {
+  http.get({ host: '127.0.0.1', port: Number(port), path: '/portal/transport', headers: { Host: `${A}:${port}`, Cookie: owner } }, (r) => { let b = ''; r.on('data', (d) => (b += d)); r.on('end', () => res(b)); });
+})))?.[1];
+await page('BUS CARDS print page renders a QR per rider', A, `/portal/transport/cards/${route1}`, owner, { text: ['Bus cards', '<svg', 'Amna Khan', 'Zara Ahmed', 'Re-issue'] });
+await page('PARENT sees the school bus section with consent state', A, '/portal/family', parent, { text: ['School bus', 'Route 1', 'Withdraw consent', 'I agree'] });
+await page('PARENT bus page renders', A, '/portal/family/bus', parent, { text: ['School bus', 'Amna'], absent: ['Zara'] });
+await page('PARENT cannot open the staff live-bus page', A, '/portal/transport/live', parent, { status: 307, loc: '/portal' });
+
 console.log(bad ? `\n${bad} page check(s) FAILED` : '\nall live page checks passed');
 process.exit(bad ? 1 : 0);

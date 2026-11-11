@@ -71,6 +71,14 @@ beforeAll(async () => {
   await q(db, b.owner, `select public.set_exam_stage($1,'moderation')`, [ex]);
   await q(db, b.owner, `select public.moderate_mark($1,$2,71,'present','fixture')`, [asm, b.students[0]!]); // mark_amendments
   await q(db, b.owner, `select public.publish_results($1)`, [ex]);                                           // result_lines, result_summaries
+  // SafeRoute (flag already on for B above): route → rider → card → parent consent → trip → bus position → boarding
+  const rt = (await q<{ id: string }>(db, b.owner, `insert into public.transport_routes (tenant_id, name) values ($1,'Fixture route') returning id`, [w.tenantB])).rows[0]!.id;
+  await q(db, b.owner, `insert into public.transport_riders (tenant_id, student_id, route_id) values ($1,$2,$3)`, [w.tenantB, b.students[0], rt]);
+  const tok = (await q<{ token: string }>(db, b.owner, `select token from public.route_cards($1)`, [rt])).rows[0]!.token;
+  await q(db, b.parent, `select public.set_transport_consent($1, true)`, [b.students[0]]);
+  const tp = (await q<{ id: string }>(db, b.owner, `select public.start_trip($1,'to_school') id`, [rt])).rows[0]!.id;
+  await q(db, b.owner, `select public.post_trip_positions($1,$2::jsonb)`, [tp, JSON.stringify([{ lat: 31.5, lng: 74.3, at: new Date().toISOString() }])]);
+  await q(db, b.owner, `select public.scan_transport_card($1,$2)`, [tp, tok]);
   // …and A gets one too, so "forged claim" / "parent in both schools" tests have something real to leak
   await seedSchool(db, w, w.tenantA, ids.ownerA, 'a');
 

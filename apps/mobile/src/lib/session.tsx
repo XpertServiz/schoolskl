@@ -9,7 +9,11 @@ export interface Access {
   tenant: { id: string; name: string; status: string; locale: Locale; currency: string };
   permissions: string[];
   features: string[];
+  /** feature flags switched on for this school (e.g. saferoute) */
+  flags?: string[];
   is_guardian: boolean;
+  /** driver or attendant on an active route */
+  is_crew?: boolean;
 }
 
 interface Ctx {

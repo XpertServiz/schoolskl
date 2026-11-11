@@ -103,3 +103,15 @@ input[type='checkbox'], input[type='radio'] { accent-color: var(--accent); width
 .auth-sep { display: flex; align-items: center; gap: .75rem; color: var(--ink-2); font-size: .9rem; margin: 0; }
 .auth-sep::before, .auth-sep::after { content: ''; flex: 1; height: 1px; background: var(--line-slate); }
 .auth-card .btn { width: 100%; text-align: center; }
+
+/* ---- transport: stacked forms, printable bus cards */
+.stack { display: grid; gap: .75rem; max-width: 32rem; }
+.stack label { display: grid; gap: .25rem; }
+.buscards { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: 1rem; }
+.buscard { border: 2px dashed var(--line-slate); border-radius: 12px; padding: .75rem; display: grid; grid-template-columns: 7rem 1fr; gap: .75rem; align-items: center; break-inside: avoid; }
+.buscard svg { width: 7rem; height: 7rem; background: #fff; border-radius: 6px; }
+.buscard strong { display: block; font-size: 1.05rem; }
+@media print {
+  .buscards { grid-template-columns: repeat(2, 1fr); gap: 6mm; }
+  .buscard { border-color: #000; color: #000; }
+}
