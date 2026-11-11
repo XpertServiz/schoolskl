@@ -88,6 +88,9 @@ export async function seedSchool(db: PGlite, w: World, tenant: string, ownerId: 
   await q(db, owner, `select public.approve_concession($1)`, [conc]);
 
   const period = '2026-11-01';
+  // A concession's valid_from defaults to the real "today"; the fixture bills a fixed month, so pin the start to that month.
+  // (Without this the suite only passed while the wall clock was before the period: it broke on 2026-11-11.)
+  await admin(db, `update public.concessions set valid_from = $1::date where id = $2`, [period, conc]);
   await q(db, accountant, `select public.generate_vouchers($1::date,$2,$3)`, [period, session, classId]);
 
   const vouchers = (await admin<{ id: string; student_id: string }>(db, `select id, student_id from public.vouchers where tenant_id = $1 and period = $2`, [tenant, period])).rows;
