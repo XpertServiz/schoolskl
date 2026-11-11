@@ -102,5 +102,10 @@ await page('PARENT sees the school bus section with consent state', A, '/portal/
 await page('PARENT bus page renders', A, '/portal/family/bus', parent, { text: ['School bus', 'Amna'], absent: ['Zara'] });
 await page('PARENT cannot open the staff live-bus page', A, '/portal/transport/live', parent, { status: 307, loc: '/portal' });
 
+// Logins (invites): users.manage needs 2FA, so the demo owner (no 2FA) gets the explanation, not the form; a teacher is sent away
+await page('PEOPLE page tells an owner without 2FA how to get access', A, '/portal/people', owner, { text: ['People and logins', '/portal/security'], absent: ['name="email"'] });
+await page('MENU shows Logins to the owner', A, '/portal', owner, { text: ['/portal/people'] });
+await page('TEACHER cannot open people', A, '/portal/people', teacher, { status: 307, loc: '/portal' });
+
 console.log(bad ? `\n${bad} page check(s) FAILED` : '\nall live page checks passed');
 process.exit(bad ? 1 : 0);

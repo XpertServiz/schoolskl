@@ -23,6 +23,8 @@ export default async function SchoolLayout({ children }: { children: React.React
     { href: '/portal/approvals', label: p.tr('nav.approvals'), show: staff },
     { href: '/portal/family', label: p.tr('nav.myFamily'), show: p.access.is_guardian },
     { href: '/portal/setup', label: p.tr('setup.nav'), show: p.can('settings.manage') },
+    // users.manage needs 2FA; an owner without it still sees the link and is told how to turn 2FA on
+    { href: '/portal/people', label: p.tr('people.nav'), show: p.can('users.manage') || (p.mfaOff && p.can('settings.manage')) },
   ];
   const groups: { label: string; items: Item[] }[] = [
     { label: p.tr('nav.group.people'), items: [

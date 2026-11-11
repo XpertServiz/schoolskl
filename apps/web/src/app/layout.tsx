@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from 'next';
+import { Suspense } from 'react';
+import { NavLoader } from '@/components/nav-loader';
 import { RegisterSW } from '@/components/register-sw';
 import { cookies } from 'next/headers';
 import { dirOf, t, type Locale } from '@ilmora/i18n';
@@ -27,6 +29,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body>
         <a className="skip" href="#main">{t(locale, 'common.skip')}</a>
         <main id="main">{children}</main>
+        <Suspense fallback={null}><NavLoader label={t(locale, 'app.loading')} /></Suspense>
         <RegisterSW />
       </body>
     </html>

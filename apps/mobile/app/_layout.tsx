@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { View } from 'react-native';
 import { startSync } from '@/lib/queue';
 import { AppProvider, useApp } from '@/lib/session';
+import { AnimatedSplash } from '@/lib/splash';
 import { color, Loading } from '@/lib/ui';
 
 function Gate() {
@@ -19,12 +20,18 @@ function Gate() {
   return <Slot />;
 }
 
+function Splash() {
+  const { tr } = useApp();
+  return <AnimatedSplash name={tr('app.name')} />;
+}
+
 export default function Root() {
   return (
     <AppProvider>
       <View style={{ flex: 1, backgroundColor: color.bg }}>
         <StatusBar style="light" />
         <Gate />
+        <Splash />
       </View>
     </AppProvider>
   );

@@ -27,8 +27,11 @@ export async function getLocale(): Promise<Locale> {
 export async function portal() {
   const user = await requireUser();
   const sb = await supabaseServer();
-  const { data } = await sb.rpc('my_access');
-  const access = data as Access | null;
+  // a failed call (network blip) is not "no school": retry once, and if it still fails show the error page rather than the school picker
+  let r = await sb.rpc('my_access');
+  if (r.error) r = await sb.rpc('my_access');
+  if (r.error) throw new Error('could not load your access — please try again');
+  const access = r.data as Access | null;
   if (!access) redirect('/portal/schools'); // signed in, but no school chosen (or no longer a member)
   // Someone who enrolled a second factor must use it: at aal1 the database refuses every money/payroll/admin key anyway, so make the
   // step-up explicit instead of showing a school full of silently-disabled buttons.
