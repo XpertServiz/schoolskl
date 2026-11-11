@@ -27,3 +27,6 @@ packages/db/dist
 
 .vercel
 .env*
+
+# shareable test handouts contain demo passwords
+handouts.local

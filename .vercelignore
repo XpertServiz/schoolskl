@@ -13,3 +13,5 @@ node_modules
 .shots
 packages/db/dist
 apps/mobile
+
+handouts.local
