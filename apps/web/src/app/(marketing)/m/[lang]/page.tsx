@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { t, type Locale } from '@ilmora/i18n';
 import { asLocale } from '@/lib/locale';
 import Campus3DLazy from '@/components/landing/Campus3DLazy';
+import NightSkyLazy from '@/components/landing/NightSkyLazy';
 import { Icons } from '@/components/landing/icons';
 import { PhoneMock } from '@/components/landing/PhoneMock';
 
@@ -11,6 +12,7 @@ export const metadata = { description: 'School management for Pakistan — fees,
 const TILES = [
   ['fees', Icons.fees, ''], ['bus', Icons.bus, 'new'], ['results', Icons.results, ''], ['attendance', Icons.attendance, ''],
   ['ledger', Icons.ledger, ''], ['people', Icons.users, ''], ['urdu', Icons.language, ''], ['offline', Icons.offline, ''],
+  ['admissions', Icons.admissions, ''], ['timetable', Icons.timetable, ''],
 ] as const;
 
 export default async function Home({ params }: { params: Promise<{ lang: string }> }) {
@@ -23,6 +25,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
     <div>
       {/* ------------------------------------------------------------ hero: words, then the 3D campus with live moments round it */}
       <section className="hero">
+        <NightSkyLazy />
         <div className="l-wrap">
           <span className="eyebrow">{tr('marketing.landing.eyebrow')}</span>
           <h1>{tr('marketing.hero.title')}</h1>

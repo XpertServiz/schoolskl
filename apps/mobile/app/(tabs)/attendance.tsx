@@ -1,10 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCallback, useEffect, useState } from 'react';
-import { Pressable, SafeAreaView, ScrollView, View } from 'react-native';
+import { Pressable, ScrollView, View } from 'react-native';
 import { attendanceKey, flushQueue, queue, type AttendanceOp } from '@/lib/queue';
 import { useApp } from '@/lib/session';
 import { supabase } from '@/lib/supabase';
-import { Button, Card, color, ErrorText, Loading, Muted, s, T } from '@/lib/ui';
+import { Button, Card, color, ErrorText, Loading, Muted, s, T, Screen } from '@/lib/ui';
 
 interface Section { id: string; name: string; class_id: string }
 interface Kid { id: string; full_name: string }
@@ -87,7 +87,7 @@ export default function Attendance() {
   const tint: Record<Status, string> = { present: color.ok, absent: color.danger, late: color.accent, leave: color.ink2 };
 
   return (
-    <SafeAreaView style={s.screen}>
+    <Screen>
       <ScrollView contentContainerStyle={s.pad}>
         {pending > 0 ? <Card><T>{tr('mobile.att.waiting', { count: pending })}</T><Button secondary label={tr('mobile.att.syncNow')} onPress={async () => { await flushQueue(); await refreshCounts(); }} /></Card> : null}
         {failed.length > 0 ? (
@@ -123,6 +123,6 @@ export default function Attendance() {
           </>
         )}
       </ScrollView>
-    </SafeAreaView>
+    </Screen>
   );
 }

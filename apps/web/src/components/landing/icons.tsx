@@ -18,6 +18,8 @@ export const Icons = {
   lock: I(<><rect x="5" y="10.5" width="14" height="10" rx="2" /><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" /></>),
   hand: I(<><path d="M8 12V5.5a1.5 1.5 0 0 1 3 0V11m0-1.5V4.5a1.5 1.5 0 0 1 3 0V11m0-4a1.5 1.5 0 0 1 3 0v6c0 4-2.5 7-6 7-2.5 0-4-1.2-5.2-3.2L4 13.5a1.4 1.4 0 0 1 2.3-1.6L8 14" /></>),
   bus: I(<><rect x="3.5" y="4" width="17" height="13" rx="2.5" /><path d="M3.5 11h17M7 20v-3M17 20v-3M7.5 14.5h.01M16.5 14.5h.01" /></>),
+  admissions: I(<><rect x="5" y="4" width="14" height="17" rx="2" /><path d="M9 4.5V3h6v1.5M9 10h6M9 14h4" /><path d="M15.5 17.5l1.5 1.5 3-3" /></>),
+  timetable: I(<><circle cx="12" cy="12" r="8.5" /><path d="M12 7.5V12l3 2" /></>),
   compass: I(<><circle cx="12" cy="12" r="9" /><path d="M15.5 8.5l-2 5-5 2 2-5z" /></>),
   logo: <svg viewBox="0 0 120 110" aria-hidden="true"><g fill="none" stroke="#F5A524" strokeWidth="9" strokeLinejoin="round" strokeLinecap="round"><path d="M14 52 60 18l46 34M24 50v42h72V50M52 92V68h16v24M60 18V4M10 98h100" /></g><path d="M60 4l22 7-22 7z" fill="#F5A524" /></svg>,
 };

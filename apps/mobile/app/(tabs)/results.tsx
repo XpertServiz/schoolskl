@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { SafeAreaView, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { useApp } from '@/lib/session';
 import { supabase } from '@/lib/supabase';
-import { Button, Card, ErrorText, Loading, Muted, s, T } from '@/lib/ui';
+import { Button, Card, ErrorText, Loading, Muted, s, T, Screen } from '@/lib/ui';
 
 interface Sum { exam_id: string; student_id: string; percent: number; grade: string | null; position: number }
 interface Card_ { student: { name: string }; exam: { name: string }; lines: { subject: string; marks: number | null; max_marks: number; grade: string | null; status: string }[]; summary: { total_marks: number; total_max: number; percent: number; grade: string | null; position: number } }
@@ -38,7 +38,7 @@ export default function Results() {
   }
 
   return (
-    <SafeAreaView style={s.screen}>
+    <Screen>
       <ScrollView contentContainerStyle={s.pad}>
         {sums === null && !err ? <Loading /> : null}
         {err ? <ErrorText>{err}</ErrorText> : null}
@@ -68,6 +68,6 @@ export default function Results() {
           </>
         )}
       </ScrollView>
-    </SafeAreaView>
+    </Screen>
   );
 }

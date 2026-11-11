@@ -1,9 +1,9 @@
 import * as Clipboard from 'expo-clipboard';
 import { useCallback, useEffect, useState } from 'react';
-import { RefreshControl, SafeAreaView, ScrollView } from 'react-native';
+import { RefreshControl, ScrollView } from 'react-native';
 import { useApp } from '@/lib/session';
 import { supabase } from '@/lib/supabase';
-import { Button, Card, ErrorText, Loading, Muted, s, T } from '@/lib/ui';
+import { Button, Card, ErrorText, Loading, Muted, s, T, Screen } from '@/lib/ui';
 
 interface V { id: string; student_id: string; voucher_no: string; consumer_no: string; due_date: string; status: string; total_minor: number; adjusted_minor: number; paid_minor: number }
 
@@ -32,7 +32,7 @@ export default function Fees() {
   useEffect(() => { void load(); }, [load]);
 
   return (
-    <SafeAreaView style={s.screen}>
+    <Screen>
       <ScrollView contentContainerStyle={s.pad} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={async () => { setRefreshing(true); await load(); setRefreshing(false); }} tintColor="#F5A524" />}>
         {rows === null && !err ? <Loading /> : null}
         {err ? <ErrorText>{err}</ErrorText> : null}
@@ -55,6 +55,6 @@ export default function Fees() {
           );
         })}
       </ScrollView>
-    </SafeAreaView>
+    </Screen>
   );
 }

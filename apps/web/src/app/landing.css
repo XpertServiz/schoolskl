@@ -170,3 +170,13 @@ html[data-splash='off'] #splash { display: none; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
   #splash { display: none; }
 }
+
+/* ---- night sky behind the hero (components/landing/NightSky.tsx); CSS stars show until WebGL draws, or without it */
+.hero-sky { position: absolute; inset: 0; z-index: -3; overflow: hidden; background: linear-gradient(180deg, #02040b 0%, #050a18 55%, #0b1424 100%); }
+.sky-fallback { position: absolute; inset: 0; opacity: .9;
+  background-image: radial-gradient(1.2px 1.2px at 12% 18%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 28% 42%, #cfe0ff 50%, transparent 51%), radial-gradient(1.5px 1.5px at 44% 12%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 63% 30%, #ffe9c4 50%, transparent 51%), radial-gradient(1.3px 1.3px at 78% 16%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 88% 48%, #cfe0ff 50%, transparent 51%), radial-gradient(1px 1px at 6% 60%, #fff 50%, transparent 51%), radial-gradient(1.2px 1.2px at 35% 70%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 70% 62%, #fff 50%, transparent 51%), radial-gradient(60px 60px at 24% 22%, rgba(230,236,255,.35), transparent 70%);
+  background-size: 100% 100%; }
+.sky-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0; transition: opacity 1.2s ease; }
+.hero-sky[data-ready='1'] .sky-canvas { opacity: 1; }
+.sky-fade { position: absolute; inset: auto 0 0; height: 30%; background: linear-gradient(transparent, var(--bg)); pointer-events: none; }
+.hero:has(.hero-sky)::before { opacity: .55; } .hero:has(.hero-sky)::after { display: none; }

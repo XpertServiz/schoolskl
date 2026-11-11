@@ -1,10 +1,10 @@
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { RefreshControl, SafeAreaView, ScrollView } from 'react-native';
+import { RefreshControl, ScrollView } from 'react-native';
 import { BusMap } from '@/lib/busmap';
 import { useApp } from '@/lib/session';
 import { supabase } from '@/lib/supabase';
-import { Button, Card, ErrorText, Loading, Muted, s, T } from '@/lib/ui';
+import { Button, Card, ErrorText, Loading, Muted, s, T, Screen } from '@/lib/ui';
 
 interface Bus {
   student_id: string; first_name: string; route_name: string; vehicle_label: string | null; stop_name: string | null;
@@ -50,7 +50,7 @@ export default function BusScreen() {
   };
 
   return (
-    <SafeAreaView style={s.screen}>
+    <Screen>
       <ScrollView contentContainerStyle={s.pad} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={async () => { setRefreshing(true); await load(); setRefreshing(false); }} tintColor="#F5A524" />}>
         {rows === null && !err ? <Loading /> : null}
         {err ? <ErrorText>{err}</ErrorText> : null}
@@ -86,6 +86,6 @@ export default function BusScreen() {
           </Card>
         ))}
       </ScrollView>
-    </SafeAreaView>
+    </Screen>
   );
 }

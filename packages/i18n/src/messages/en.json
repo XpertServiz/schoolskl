@@ -179,7 +179,9 @@
   },
   "mobile": {
     "tab": { "home": "Home", "more": "More" },
-    "login": { "welcome": "Welcome", "tagline": "Fees, attendance and results for your school.", "badPhone": "Enter a Pakistani mobile number, for example 0300 1234567.", "sendFailed": "We could not send a code to that number.", "badCode": "Enter the 6-digit code.", "wrongCode": "That code is wrong or has expired.", "codeSent": "We sent a code to {phone}." },
+    "schools": { "open": "Tap to open" },
+    "home": { "morning": "Good morning", "afternoon": "Good afternoon", "evening": "Good evening", "quick": "Quick actions", "children": "Your children" },
+    "login": { "tabCode": "Email code", "tabPassword": "Password", "firstTime": "First time here?", "firstTimeBody": "Your school has already added you. Enter the email the school has for you and we'll send a code to activate your account.", "activate": "Activate my account", "welcome": "Welcome", "tagline": "Fees, attendance and results for your school.", "badPhone": "Enter a Pakistani mobile number, for example 0300 1234567.", "sendFailed": "We could not send a code to that number.", "badCode": "Enter the 6-digit code.", "wrongCode": "That code is wrong or has expired.", "codeSent": "We sent a code to {phone}." },
     "fees": { "payWith": "Pay at any bank or in your banking app using this consumer number:", "copy": "Copy number", "copied": "Copied" },
     "results": { "open": "View report card" },
     "att": { "noRoster": "This class list has not been downloaded yet. Connect to the internet once to load it.", "queued": "Saved on this phone. It will be sent when you are online.", "waiting": "{count} register(s) waiting to be sent", "syncNow": "Send now", "dismiss": "Dismiss", "hint": "Tap a child to change: present, absent, late, on leave." },
@@ -194,7 +196,7 @@
       "lead": "Fees, results, attendance and the school bus — one app, in Urdu and English.",
       "moment": { "feeB": "Fee paid", "feeS": "Rs 4,500 · Amna", "busB": "On the bus", "busS": "Amna · 7:42 am", "attB": "Attendance 96%", "attS": "Grade 5 · today", "resB": "Result: A1", "resS": "Mid-term published" },
       "tilesTitle": "Everything a school runs on", "badgeNew": "New",
-      "tile": { "fees": "Fees & challans", "ledger": "Books that balance", "results": "Results & report cards", "attendance": "Attendance", "bus": "School bus tracking", "urdu": "Urdu + English", "offline": "Works offline", "people": "Staff & payroll" },
+      "tile": { "fees": "Fees & challans", "ledger": "Books that balance", "results": "Results & report cards", "attendance": "Attendance", "bus": "School bus tracking", "urdu": "Urdu + English", "offline": "Works offline", "people": "Staff & payroll", "admissions": "Admissions", "timetable": "Timetable" },
       "appsTitle": "One app. Every family.", "who": { "parents": "Parents", "teachers": "Teachers", "drivers": "Drivers", "office": "School office" },
       "trust": { "noAds": "No ads", "noTrack": "No trackers", "consent": "Parent consent first", "locked": "Each school's data locked" },
       "finalTitle": "See it running in your school."

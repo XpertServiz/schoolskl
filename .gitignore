@@ -30,3 +30,5 @@ packages/db/dist
 
 # shareable test handouts contain demo passwords
 handouts.local
+
+apps/mobile/dist-web

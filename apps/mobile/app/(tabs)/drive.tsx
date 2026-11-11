@@ -6,7 +6,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Modal, Pressable, SafeAreaView, ScrollView, View } from 'react-native';
 import { useApp } from '@/lib/session';
 import { supabase } from '@/lib/supabase';
-import { Button, Card, ErrorText, Loading, Muted, color, s, T } from '@/lib/ui';
+import { Button, Card, ErrorText, Loading, Muted, color, s, Screen, T } from '@/lib/ui';
 
 interface Route { route_id: string; name: string; vehicle_label: string | null; riders: number; open_trip_id: string | null; open_direction: string | null; saferoute_on: boolean }
 interface Rider { student_id: string; first_name: string; stop_name: string | null; consent: boolean; state: 'boarded' | 'alighted' | null }
@@ -73,7 +73,8 @@ export default function Drive() {
       const saved = await AsyncStorage.getItem(ptsKey(trip.id));
       if (saved) buffer.current = [...(JSON.parse(saved) as Point[]), ...buffer.current];
       await loadRiders(trip.id);
-      await activateKeepAwakeAsync(KEEP_AWAKE);
+      // keep the screen on if the phone allows it; if it refuses, location sharing must still start
+      await activateKeepAwakeAsync(KEEP_AWAKE).catch(() => {});
       const perm = await Location.requestForegroundPermissionsAsync();
       if (perm.status !== 'granted') { setErr(tr('transport.drive.permission')); return; }
       if (cancelled) return;
@@ -91,9 +92,10 @@ export default function Drive() {
     return () => {
       cancelled = true;
       clearInterval(timer);
-      watch.current?.remove(); watch.current = null;
+      try { watch.current?.remove(); } catch { /* expo-location on web throws here; the watch is gone either way */ }
+      watch.current = null;
       setSharing(false);
-      deactivateKeepAwake(KEEP_AWAKE);
+      Promise.resolve().then(() => deactivateKeepAwake(KEEP_AWAKE)).catch(() => { /* was never active */ });
     };
   }, [trip, flush, loadRiders, tr]);
 
@@ -148,10 +150,10 @@ export default function Drive() {
     setScanOpen(true);
   };
 
-  if (routes === null && !err) return <SafeAreaView style={s.screen}><Loading /></SafeAreaView>;
+  if (routes === null && !err) return <Screen><Loading /></Screen>;
 
   return (
-    <SafeAreaView style={s.screen}>
+    <Screen>
       <ScrollView contentContainerStyle={s.pad}>
         {err ? <ErrorText>{err}</ErrorText> : null}
         {last ? <Card><T style={{ color: last.ok ? color.ok : color.danger, fontWeight: '700', fontSize: 18 }}>{last.text}</T></Card> : null}
@@ -215,6 +217,6 @@ export default function Drive() {
           <Button secondary label={tr('transport.drive.close')} onPress={() => setScanOpen(false)} />
         </SafeAreaView>
       </Modal>
-    </SafeAreaView>
+    </Screen>
   );
 }
