@@ -85,6 +85,10 @@ await page('marketing home', 'localhost', '/', null, { text: ['Your school, runn
 await page('pricing reads the live plan catalogue (no prices → Contact us)', 'localhost', '/pricing', null, { text: ['Starter', 'Growth', 'Contact us'] });
 await page('tenant site resolves a real school host', 'noor-academy.localhost', '/', null, { text: ['Noor Academy'] });
 await page('unknown school host is a 404', 'ghost-school.localhost', '/', null, { status: 404 });
+await page('the root host never serves the portal (plain 404, not an RSC page)', 'localhost', '/portal', owner, { status: 404, text: ['couldn'], absent: ['Noor Academy'] });
+await page('the root host never serves the vendor console', 'localhost', '/vendor/tenants', vendor, { status: 404, absent: ['City Grammar'] });
+await page('STUDENT IMPORT page renders for the owner', A, '/portal/students/import', owner, { text: ['Import students', 'Upload and check', 'Download an example file'] });
+await page('TEACHER cannot open student import', A, '/portal/students/import', teacher, { status: 307, loc: '/portal' });
 
 console.log(bad ? `\n${bad} page check(s) FAILED` : '\nall live page checks passed');
 process.exit(bad ? 1 : 0);

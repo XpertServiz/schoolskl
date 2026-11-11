@@ -61,6 +61,8 @@ const PAGE_QUERIES: Record<string, string> = {
   'timetable:sections': `select id, class_id, name from public.sections order by name`,
   'timetable:staff': `select id, full_name from public.staff_members where status = 'active' order by full_name`,
   'timetable:slots': `select id, day_of_week, period_id, subject_id, teacher_id from public.timetable_slots`,
+  'import:batches': `select id, status, summary, created_at from public.import_batches where entity = 'students' order by created_at desc limit 10`,
+  'import:rows': `select row_no, raw, status, errors from public.import_rows order by row_no limit 2000`,
 };
 
 beforeAll(async () => {

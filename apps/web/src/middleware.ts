@@ -21,7 +21,14 @@ export async function middleware(req: NextRequest) {
 
   switch (k.kind) {
     case 'root':
-      return internal ? NextResponse.rewrite(new URL('/not-found', req.url)) : NextResponse.next();
+      if (!internal) return NextResponse.next();
+      // DECISION: internal prefixes on the root host get a small static 404 page, not a rewrite to the rendered /not-found route.
+      // When a server action redirects, Next pre-renders the target with an internal fetch to the server's own origin (`next start` →
+      // http://localhost:PORT), which loses the app./vendor. host and lands here. If that fetch gets a React Server Component response
+      // (the rendered not-found page), Next shows it — so every portal form ended on "page not found" after saving. A non-RSC answer
+      // makes Next fall back to a client-side redirect, which goes through the right host. (Middleware cannot tell those internal
+      // fetches apart: Next strips the `rsc` header before middleware runs.) Still fails closed — nothing internal is served here.
+      return new NextResponse(NOT_FOUND_HTML, { status: 404, headers: { 'content-type': 'text/html; charset=utf-8' } });
     case 'reserved': {
       // signed-in surfaces refresh the session so server-rendered pages never see an expired token
       if (k.label === 'vendor') return refreshSession(req, rewrite(req, pathname.startsWith('/vendor') ? pathname : `/vendor${pathname === '/' ? '' : pathname}`, search));
@@ -36,6 +43,11 @@ export async function middleware(req: NextRequest) {
     }
   }
 }
+
+const NOT_FOUND_HTML =
+  '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">' +
+  '<title>404</title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#16202b;color:#e8eef4;font-family:system-ui,sans-serif;text-align:center}</style></head>' +
+  '<body><main><h1>404</h1><p>We couldn\'t find this page.</p><p lang="ur" dir="rtl">ہمیں یہ صفحہ نہیں ملا۔</p><p><a href="/" style="color:#ffb547">Home</a></p></main></body></html>';
 
 function rewrite(req: NextRequest, path: string, search: string) {
   return NextResponse.rewrite(new URL(`${path}${search}`, req.url));

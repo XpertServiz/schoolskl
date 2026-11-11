@@ -90,6 +90,24 @@
     "needSetup": "Add subjects and bell periods first.", "breakCell": "Break", "clashHint": "The system refuses a lesson that overlaps another lesson of the same section or the same teacher.",
     "days": { "1": "Mon", "2": "Tue", "3": "Wed", "4": "Thu", "5": "Fri", "6": "Sat", "7": "Sun" }
   },
+  "import": {
+    "title": "Import students", "open": "Import from a spreadsheet",
+    "intro": "Add many students at once from a spreadsheet. In Excel or Google Sheets choose File → Save as / Download → CSV. One row per child. Needed columns: student name, class, parent/guardian name, mobile. Optional: section, date of birth, gender.",
+    "template": "Download an example file", "file": "CSV file", "upload": "Upload and check",
+    "how": "Nothing is added until every row is correct. Brothers and sisters are linked automatically when they have the same parent mobile number.",
+    "summary": "{valid} rows ready · {errors} rows with problems", "fixHint": "Fix these rows in your spreadsheet and upload the file again.",
+    "commit": "Add {n} students", "committed": "{n} students added.", "check": "Check again",
+    "rollback": "Undo this import", "rollbackHint": "Removes the students this file added. Not possible once fees or attendance exist for them.", "rolledBack": "Import undone.",
+    "row": "Row", "problems": "Problems", "recent": "Recent imports", "rows": "Rows",
+    "status": { "uploaded": "Uploaded", "dry_run_ok": "Ready to add", "dry_run_failed": "Has problems", "committed": "Added", "rolled_back": "Undone" },
+    "err": {
+      "noRows": "The file has no student rows.", "tooMany": "At most 2000 rows per file. Split the file and upload in parts.", "headers": "The file is missing these columns: {cols}", "file": "Choose a CSV file (up to 900 KB).",
+      "class_unknown": "Class not found. Use the class name exactly as it is in the system.", "section_unknown": "Section not found in this class.", "section_required": "This class has more than one section. Fill in the section.",
+      "name_required": "Student name is missing.", "guardian_required": "Parent/guardian name is missing.", "phone_invalid": "Not a Pakistani mobile number (example: 0300 1234567).",
+      "dob_invalid": "Date of birth should look like 2016-06-05 or 05/06/2016.", "gender_invalid": "Gender should be male, female or other.",
+      "duplicate_in_file": "This child appears twice in the file.", "already_on_file": "This child is already in the system.", "no_current_session": "There is no current academic session. Set one up first."
+    }
+  },
   "password": {
     "title": "Change password", "why": "Forgot your password? Sign in with an email code, then set a new one here.", "new": "New password", "confirm": "Repeat new password", "save": "Save password", "saved": "Password changed.", "forgot": "Forgot your password? Sign in with the email code above, then change it under Security.",
     "err": { "short": "Use at least 10 characters.", "mismatch": "The two passwords do not match.", "failed": "We could not change the password. Sign in again and retry." }

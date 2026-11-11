@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { Flash } from '@/components/flash';
@@ -54,6 +55,7 @@ export default async function Students({ searchParams }: { searchParams: Promise
     <>
       <h1>{p.tr('students.title')}</h1>
       <Flash sp={sp} />
+      {p.can('data.import') && p.can('students.create') ? <p><Link className="btn secondary small" href="/portal/students/import">{p.tr('import.open')}</Link></p> : null}
       <form className="inline" style={{ marginBottom: '1rem' }}>
         <input name="q" defaultValue={sp.q ?? ''} placeholder={p.tr('ui.name')} aria-label={p.tr('common.search')} />
         <button className="btn secondary small">{p.tr('common.search')}</button>
