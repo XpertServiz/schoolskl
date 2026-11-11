@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { headers } from 'next/headers';
 
-const product = process.env.NEXT_PUBLIC_PRODUCT_NAME ?? 'Ilmora';
+const product = process.env.NEXT_PUBLIC_PRODUCT_NAME ?? 'Ilmified';
 
 /**
  * Makes the site installable ("Add to Home Screen") with its own icon, splash colour and a standalone window.

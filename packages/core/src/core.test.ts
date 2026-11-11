@@ -58,3 +58,15 @@ describe('classifyHost', () => {
     expect(classifyHost('noor.localhost:3000', 'ilmora.pk')).toEqual({ kind: 'tenant-subdomain', slug: 'noor' });
   });
 });
+
+describe('formatRupees (display: no decimals)', () => {
+  it('drops the paisa and rounds half away from zero', async () => {
+    const { formatRupees } = await import('./index');
+    expect(formatRupees(money(5000000n, 'PKR'))).toBe('PKR 50,000');
+    expect(formatRupees(money(150050n, 'PKR'))).toBe('PKR 1,501');
+    expect(formatRupees(money(150049n, 'PKR'))).toBe('PKR 1,500');
+    expect(formatRupees(money(-250000n, 'PKR'))).toBe('PKR -2,500'.replace('PKR -', '-PKR '));
+    expect(formatRupees(money(0n, 'PKR'))).toBe('PKR 0');
+    expect(formatRupees(money(-10n, 'PKR'))).toBe('PKR 0');
+  });
+});

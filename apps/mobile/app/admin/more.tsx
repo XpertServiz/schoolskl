@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { useApp } from '@/lib/session';
@@ -6,6 +7,7 @@ import { Avatar, Button, Card, color, Header, Icon, Muted, Screen, T } from '@/l
 
 export default function AdminMore() {
   const { tr, locale, setLocale, signOut, rtl, vendorRole } = useApp();
+  const router = useRouter();
   const [email, setEmail] = useState('');
   useEffect(() => { supabase.auth.getSession().then(({ data }) => setEmail(data.session?.user.email ?? '')); }, []);
   return (
@@ -19,6 +21,7 @@ export default function AdminMore() {
             <Icon name="shield-checkmark" tint={color.ok} />
           </View>
         </Card>
+        <Button icon="globe-outline" label={locale === 'ur' ? 'مکمل کنسول (تمام آپشنز)' : 'Full console (all options)'} onPress={() => router.push('/portal' as never)} />
         <Button secondary icon="language-outline" label={tr('nav.language')} onPress={() => void setLocale(locale === 'ur' ? 'en' : 'ur')} />
         <Button secondary danger icon="log-out-outline" label={tr('nav.signOut')} onPress={() => void signOut()} />
         <Muted>{tr('ma.admin.web')}</Muted>

@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useCallback, useEffect, useState } from 'react';
 import { RefreshControl, ScrollView, View } from 'react-native';
+import { Campus3D } from '@/lib/campus3d';
 import { useApp } from '@/lib/session';
 import { supabase } from '@/lib/supabase';
 import { Avatar, Bar, Card, Chip, color, Empty, ErrorText, gradient, H1, H2, Loading, Muted, Screen, T, Tile } from '@/lib/ui';
@@ -78,6 +79,7 @@ export default function Home() {
   return (
     <Screen>
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={async () => { setRefreshing(true); await load(); setRefreshing(false); }} tintColor={color.accent} />}>
+        <Campus3D height={210} name={access?.tenant.name} />
         <LinearGradient colors={gradient.hero} style={{ padding: 22, paddingTop: 14, borderBottomLeftRadius: 28, borderBottomRightRadius: 28, gap: 14 }}>
           <View style={{ flexDirection: rtl ? 'row-reverse' : 'row', alignItems: 'center', gap: 14 }}>
             <Avatar name={me || access?.tenant.name || '?'} size={54} />

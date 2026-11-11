@@ -79,6 +79,9 @@ beforeAll(async () => {
   const tp = (await q<{ id: string }>(db, b.owner, `select public.start_trip($1,'to_school') id`, [rt])).rows[0]!.id;
   await q(db, b.owner, `select public.post_trip_positions($1,$2::jsonb)`, [tp, JSON.stringify([{ lat: 31.5, lng: 74.3, at: new Date().toISOString() }])]);
   await q(db, b.owner, `select public.scan_transport_card($1,$2)`, [tp, tok]);
+  // owner suite: attendance device + bank reconciliation
+  await q(db, b.owner, `select public.register_attendance_device('Gate machine')`);
+  await q(db, b.owner, `select public.save_bank_reconciliation($1::date, 0, 'fixture')`, [b.today]);
   // …and A gets one too, so "forged claim" / "parent in both schools" tests have something real to leak
   await seedSchool(db, w, w.tenantA, ids.ownerA, 'a');
 

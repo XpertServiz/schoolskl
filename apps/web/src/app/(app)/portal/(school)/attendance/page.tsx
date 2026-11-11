@@ -43,22 +43,21 @@ export default async function Attendance({ searchParams }: { searchParams: Promi
     p.sb.from('sections').select('id, class_id, name').order('name'),
   ]);
   const cls = new Map((classes ?? []).map((c) => [c.id, c.name as string]));
-  const section = (sections ?? []).find((s) => s.id === sp.section);
+  // DECISION: with no class chosen yet, open the first section so the register (with names) is on screen straight away
+  const section = (sections ?? []).find((s) => s.id === sp.section) ?? (sections ?? [])[0];
   const day = date.safeParse(sp.date).success ? sp.date! : new Date().toISOString().slice(0, 10);
 
-  let roster: { id: string; full_name: string; status: string }[] = [];
+  let roster: { id: string; full_name: string; roll: number | null; status: string }[] = [];
   if (section) {
-    const { data: enrolled } = await p.sb.from('student_enrolments').select('student_id, roll_no').eq('section_id', section.id).eq('status', 'active').order('roll_no');
-    const ids = (enrolled ?? []).map((e) => e.student_id as string);
-    const [{ data: studs }, { data: marks }] = ids.length
-      ? await Promise.all([
-          p.sb.from('students').select('id, full_name').in('id', ids),
-          p.sb.from('student_attendance').select('student_id, status').eq('section_id', section.id).eq('att_date', day),
-        ])
-      : [{ data: [] }, { data: [] }];
-    const name = new Map((studs ?? []).map((s) => [s.id as string, s.full_name as string]));
+    const [{ data: enrolled }, { data: marks }] = await Promise.all([
+      p.sb.from('student_enrolments').select('student_id, roll_no, students(id, full_name)').eq('section_id', section.id).eq('status', 'active').order('roll_no'),
+      p.sb.from('student_attendance').select('student_id, status').eq('section_id', section.id).eq('att_date', day),
+    ]);
     const st = new Map((marks ?? []).map((m) => [m.student_id as string, m.status as string]));
-    roster = ids.map((id) => ({ id, full_name: name.get(id) ?? '—', status: st.get(id) ?? 'present' }));
+    roster = (enrolled ?? []).map((e) => {
+      const stu = (Array.isArray(e.students) ? e.students[0] : e.students) as { full_name?: string } | null;
+      return { id: e.student_id as string, full_name: stu?.full_name ?? '—', roll: e.roll_no as number | null, status: st.get(e.student_id as string) ?? 'present' };
+    });
   }
   const canMark = p.can('attendance.mark');
 
@@ -82,10 +81,11 @@ export default async function Attendance({ searchParams }: { searchParams: Promi
           <p className="muted">{p.tr('attendance.tickAbsent')}</p>
           <div className="table-scroll">
             <table className="grid">
-              <thead><tr><th>{p.tr('ui.name')}</th><th>{p.tr('ui.status')}</th></tr></thead>
+              <thead><tr><th>#</th><th>{p.tr('ui.name')}</th><th>{p.tr('ui.status')}</th></tr></thead>
               <tbody>
                 {roster.map((r) => (
                   <tr key={r.id}>
+                    <td className="ltr">{r.roll ?? ""}</td>
                     <td>{r.full_name}</td>
                     <td>
                       <select name={`s_${r.id}`} defaultValue={r.status} disabled={!canMark} aria-label={r.full_name}>

@@ -1,4 +1,7 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import { Bars, Donut, Meter } from '@/components/charts';
+import { LiveBuses } from '@/components/live-buses';
 import { Flash } from '@/components/flash';
 import { portal } from '@/lib/portal';
 import { setupSteps, type Progress } from '@/lib/setup';
@@ -30,6 +33,27 @@ export default async function Cockpit({ searchParams }: { searchParams: Promise<
   if (p.access.is_guardian && !c.fees && !c.students && !c.attendance) {
     return <p><Link className="btn" href="/portal/family">{p.tr('nav.myFamily')}</Link></p>;
   }
+  // A driver / attendant has no school numbers: their home is the bus screen.
+  if (p.access.is_crew && !c.fees && !c.students && !c.attendance && p.flag('saferoute')) redirect('/portal/transport/driver');
+
+  // Series for the charts: only what this person is allowed to read (RLS decides; we just skip the calls they cannot make).
+  const since = (d: number) => new Date(Date.now() - d * 86400000).toISOString().slice(0, 10);
+  const [coll, aging, att] = await Promise.all([
+    c.fees ? p.sb.from('v_collection_daily').select('received_on, collected_minor').gte('received_on', since(13)) : Promise.resolve({ data: [] }),
+    c.fees ? p.sb.from('v_fee_aging').select('bucket, balance_minor') : Promise.resolve({ data: [] }),
+    c.attendance ? p.sb.from('v_attendance_daily').select('att_date, total, present, absent').gte('att_date', since(6)) : Promise.resolve({ data: [] }),
+  ]);
+  const days14 = Array.from({ length: 14 }, (_, i) => since(13 - i));
+  const byDay = new Map<string, number>();
+  for (const r of coll.data ?? []) byDay.set(r.received_on as string, (byDay.get(r.received_on as string) ?? 0) + Number(r.collected_minor));
+  const collSeries = days14.map((d) => ({ label: d.slice(5), value: byDay.get(d) ?? 0 }));
+  const buckets = ['current', '0-30', '31-60', '61-90', '90+'];
+  const ageMap = new Map<string, number>();
+  for (const r of aging.data ?? []) ageMap.set(r.bucket as string, (ageMap.get(r.bucket as string) ?? 0) + Number(r.balance_minor));
+  const days7 = Array.from({ length: 7 }, (_, i) => since(6 - i));
+  const attMap = new Map<string, { t: number; pr: number }>();
+  for (const r of att.data ?? []) { const x = attMap.get(r.att_date as string) ?? { t: 0, pr: 0 }; x.t += Number(r.total); x.pr += Number(r.present); attMap.set(r.att_date as string, x); }
+  const attSeries = days7.map((d) => ({ label: d.slice(5), value: attMap.get(d)?.t ? Math.round(((attMap.get(d)!.pr) / attMap.get(d)!.t) * 100) : 0 }));
   // Only people who can change the school's setup see "finish setting up"; others never call setup_progress (it would refuse them).
   let setup: { done: number; total: number } | null = null;
   if (p.can('settings.manage')) {
@@ -81,6 +105,27 @@ export default async function Cockpit({ searchParams }: { searchParams: Promise<
           </>
         ) : null}
       </div>
+
+      {c.fees || c.attendance ? (
+        <div className="chartgrid">
+          {c.fees ? (
+            <>
+              <section className="card"><h3 style={{ marginTop: 0 }}>{p.l('Fees collected — last 14 days', 'فیس وصولی — پچھلے 14 دن')}</h3><Bars data={collSeries} fmt={p.fmt} title={p.l('Fees collected per day', 'روزانہ فیس وصولی')} /></section>
+              <section className="card"><h3 style={{ marginTop: 0 }}>{p.l('Collected vs outstanding (month)', 'ماہانہ: وصول بمقابلہ بقایا')}</h3>
+                <Donut title={p.l('Collected versus outstanding', 'وصول بمقابلہ بقایا')} center={c.fees.collected_month_minor + c.fees.outstanding_minor > 0 ? Math.round((c.fees.collected_month_minor / (c.fees.collected_month_minor + c.fees.outstanding_minor)) * 100) + '%' : '—'}
+                  parts={[{ label: p.l('Collected', 'وصول') + ' ' + p.fmt(c.fees.collected_month_minor), value: c.fees.collected_month_minor, color: '#14b8a6' }, { label: p.l('Outstanding', 'بقایا') + ' ' + p.fmt(c.fees.outstanding_minor), value: c.fees.outstanding_minor, color: '#f59e0b' }]} /></section>
+              <section className="card"><h3 style={{ marginTop: 0 }}>{p.l('Who owes — by age', 'بقایا — عمر کے لحاظ سے')}</h3><Bars data={buckets.map((b) => ({ label: b, value: ageMap.get(b) ?? 0 }))} fmt={p.fmt} title={p.l('Outstanding fees by age', 'بقایا فیس بلحاظ عمر')} /></section>
+            </>
+          ) : null}
+          {c.attendance ? (
+            <section className="card"><h3 style={{ marginTop: 0 }}>{p.l('Attendance % — last 7 days', 'حاضری % — پچھلے 7 دن')}</h3>
+              <Bars data={attSeries} fmt={(n) => n + '%'} title={p.l('Attendance percent per day', 'روزانہ حاضری فیصد')} />
+              <Meter value={c.attendance.sections_marked} of={c.attendance.sections_total} label={p.l('Registers taken today', 'آج کی حاضری رجسٹر')} />
+            </section>
+          ) : null}
+        </div>
+      ) : null}
+      <LiveBuses p={p} />
     </>
   );
 }

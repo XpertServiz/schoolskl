@@ -46,6 +46,7 @@ export default async function Exam({ params, searchParams }: { params: Promise<{
     <>
       <p><Link href="/portal/exams">← {p.tr('ui.back')}</Link></p>
       <h1>{exam.name} <span className="pill">{p.tr(`exams.stage.${exam.status}`)}</span></h1>
+      {exam.status === 'marking' ? <p><Link className="btn secondary small" href={`/portal/exams/${id}/student`}>{p.l('Marks per student', 'فی طالب علم نمبر')}</Link></p> : null}
       <Flash sp={sp} />
       {rows.length === 0 ? <p className="muted">{p.tr('ui.empty')}</p> : (
         <div className="table-scroll"><table className="grid">

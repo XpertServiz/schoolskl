@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useEffect, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, Text, View } from 'react-native';
-import { Logo3D } from '@/lib/logo3d';
+import { Campus3D } from '@/lib/campus3d';
 import { useApp } from '@/lib/session';
 import { supabase } from '@/lib/supabase';
 import { Button, Card, color, ErrorText, Field, H1, Icon, Muted, Notice, Press, Screen, T } from '@/lib/ui';
@@ -15,6 +16,8 @@ export default function Login() {
   const { tr, locale, setLocale, rtl } = useApp();
   const [mode, setMode] = useState<Mode>('code');
   const [email, setEmail] = useState('');
+  const [school, setSchool] = useState<string | undefined>(undefined);
+  useEffect(() => { AsyncStorage.getItem('lastSchool').then((v) => { if (v) setSchool(v); }).catch(() => {}); }, []);
   const [code, setCode] = useState('');
   const [password, setPassword] = useState('');
   const [sentTo, setSentTo] = useState<string | null>(null);
@@ -67,7 +70,7 @@ export default function Login() {
           </View>
 
           <View style={{ alignItems: 'center', gap: 6 }}>
-            <Logo3D size={112} />
+            <Campus3D height={250} name={school} />
             <H1 style={{ textAlign: 'center' }}>{tr('mobile.login.welcome')}</H1>
             <Muted style={{ textAlign: 'center', maxWidth: 320 }}>{tr('mobile.login.tagline')}</Muted>
           </View>

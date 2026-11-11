@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { Session } from '@supabase/supabase-js';
-import { formatMoney, money } from '@ilmora/core';
+import { formatRupees, money } from '@ilmora/core';
 import { t, type Locale } from '@ilmora/i18n';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { supabase } from './supabase';
@@ -53,6 +53,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const uid = (await supabase.auth.getSession()).data.session?.user.id ?? '00000000-0000-0000-0000-000000000000';
     const [{ data }, v] = await Promise.all([supabase.rpc('my_access'), supabase.from('vendor_staff').select('role').eq('user_id', uid).maybeSingle()]);
     setAccess((data as Access | null) ?? null);
+    // remembered so the sign-in screen can paint this school's name on the 3D campus next time (a school name is not secret)
+    const nm = (data as Access | null)?.tenant?.name;
+    if (nm) void AsyncStorage.setItem('lastSchool', nm);
     setVendorRole(((v.data as { role?: string } | null)?.role) ?? null);
   }, []);
 
@@ -79,7 +82,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return {
       ready, session, access, vendorRole, locale, rtl: locale === 'ur', setLocale,
       tr: (k, v) => t(locale, k, v),
-      fmt: (m) => formatMoney(money(BigInt(Math.trunc(Number(m ?? 0))), cur), locale === 'ur' ? 'ur-PK' : 'en-PK'),
+      fmt: (m) => formatRupees(money(BigInt(Math.trunc(Number(m ?? 0))), cur), locale === 'ur' ? 'ur-PK' : 'en-PK'),
       can: (p) => perms.has(p),
       refreshAccess,
       signOut: async () => { await supabase.auth.signOut(); },

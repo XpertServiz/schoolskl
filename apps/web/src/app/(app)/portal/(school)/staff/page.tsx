@@ -87,13 +87,31 @@ async function checkOut() {
 
 const hhmm = (x: unknown) => (typeof x === 'string' ? x.slice(0, 5) : '');
 
+async function addDevice(form: FormData) {
+  'use server';
+  const sb = await supabaseServer();
+  const { data, error } = await sb.rpc('register_attendance_device', { p_name: String(form.get('name') ?? '') });
+  if (error) return fail(here, error);
+  revalidatePath(here);
+  // the key is shown once, in the message, and never stored in readable form
+  done(here, 'Device key (copy it now, it is not shown again): ' + data);
+}
+async function toggleDevice(form: FormData) {
+  'use server';
+  const sb = await supabaseServer();
+  const { error } = await sb.rpc('set_attendance_device_active', { p_id: String(form.get('id')), p_active: form.get('on') === '1' });
+  if (error) return fail(here, error);
+  revalidatePath(here);
+  done(here, 'OK');
+}
+
 export default async function Staff({ searchParams }: { searchParams: Promise<{ ok?: string; err?: string; date?: string }> }) {
   const p = await portal();
   const sp = await searchParams;
-  const manager = p.can('payroll.prepare');
+  const manager = p.can('staff.manage');
   const viewer = manager || p.can('attendance.view') || p.can('timetable.manage');
   const { data: mine } = await p.sb.from('staff_members').select('id, full_name, status').eq('user_id', p.user.id).maybeSingle();
-  if (!viewer && !mine) need(p, 'payroll.prepare'); // bounces with "no access"
+  if (!viewer && !mine) need(p, 'staff.manage'); // bounces with "no access"
 
   const today = new Date().toISOString().slice(0, 10);
   const day = date.safeParse(sp.date).success ? sp.date! : today;
@@ -109,6 +127,7 @@ export default async function Staff({ searchParams }: { searchParams: Promise<{ 
   const linked = new Set((staff ?? []).map((s) => s.user_id).filter(Boolean));
   const freeIds = (members ?? []).map((m) => m.user_id as string).filter((id) => !linked.has(id));
   const { data: profiles } = freeIds.length ? await p.sb.from('profiles').select('user_id, full_name').in('user_id', freeIds) : { data: [] };
+  const { data: devices } = manager ? await p.sb.from('attendance_devices').select('id, name, is_active, last_seen').order('created_at') : { data: [] };
   const att = new Map((marks ?? []).map((m) => [m.staff_id as string, m.status as string]));
   const active = (staff ?? []).filter((s) => s.status === 'active' || s.status === 'on_leave');
 
@@ -127,6 +146,17 @@ export default async function Staff({ searchParams }: { searchParams: Promise<{ 
             {!myToday?.check_in ? <form action={checkIn}><button className="btn">{p.tr('staff.me.checkIn')}</button></form> : null}
             {myToday?.check_in && !myToday?.check_out ? <form action={checkOut}><button className="btn secondary">{p.tr('staff.me.checkOut')}</button></form> : null}
           </div>
+        </section>
+      ) : null}
+
+      {manager ? (
+        <section className="card">
+          <h2 style={{ marginTop: 0 }}>{p.l('Attendance machines (fingerprint / face / card)', 'حاضری مشینیں (فنگر پرنٹ / چہرہ / کارڈ)')}</h2>
+          <p className="muted">{p.l('Register a machine to get a device key. The machine, or a small bridge program that reads its database, sends each punch as POST /api/attendance/punch {token, employee_no, at}. The employee number must match the one on the staff record. A punch is recorded as the employee’s own attendance and an earlier check-in is never changed.', 'مشین رجسٹر کر کے ڈیوائس کلید لیں۔ مشین، یا اس کا ڈیٹا بیس پڑھنے والا چھوٹا برج پروگرام، ہر پنچ POST /api/attendance/punch {token, employee_no, at} پر بھیجتا ہے۔ ملازم نمبر اسٹاف ریکارڈ کے مطابق ہو۔ پنچ ملازم کی اپنی حاضری کے طور پر درج ہوتا ہے اور پہلا چیک اِن کبھی تبدیل نہیں ہوتا۔')}</p>
+          {(devices ?? []).map((d) => (
+            <form key={d.id} action={toggleDevice} className="inline"><input type="hidden" name="id" value={d.id} /><strong>{d.name}</strong><span className="muted ltr">{d.last_seen ? String(d.last_seen).slice(0, 16).replace('T', ' ') : p.l('never seen', 'ابھی تک رابطہ نہیں')}</span><button name="on" value={d.is_active ? '0' : '1'} className="btn secondary small">{d.is_active ? p.l('Switch off', 'بند') : p.l('Switch on', 'چالو')}</button></form>
+          ))}
+          <form action={addDevice} className="inline" style={{ marginTop: '.75rem' }}><input name="name" required minLength={2} placeholder={p.l('Machine name, e.g. Front gate', 'مشین کا نام، مثلاً مین گیٹ')} /><button className="btn small">{p.l('Add machine', 'مشین شامل کریں')}</button></form>
         </section>
       ) : null}
 

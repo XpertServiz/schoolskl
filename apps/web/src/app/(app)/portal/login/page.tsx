@@ -10,7 +10,7 @@ import '../../../landing.css';
 
 export const metadata = { title: 'Sign in', robots: { index: false, follow: false } };
 
-const product = process.env.NEXT_PUBLIC_PRODUCT_NAME ?? 'Ilmora';
+const product = process.env.NEXT_PUBLIC_PRODUCT_NAME ?? 'Ilmified';
 
 /** Sign in, dressed like the landing page: the night sky and the rising 3D campus beside a glass card. */
 export default async function Login() {
@@ -28,7 +28,7 @@ export default async function Login() {
           <h1>{tr('marketing.hero.title')}</h1>
           <p className="lead">{tr('marketing.v2.lead')}</p>
         </div>
-        <div className="auth-campus campus-card"><Campus3DLazy label={tr('marketing.landing.campusLabel')} /></div>
+        <div className="auth-campus campus-card"><Campus3DLazy label={tr('marketing.landing.campusLabel')} remember /></div>
       </section>
 
       <section className="auth-panel">

@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 /** Static stand-in: shown while three.js loads, with no WebGL, and with JS off. Same house as the app icon. */
 export function CampusIllustration({ label }: { label: string }) {
@@ -19,7 +19,18 @@ export function CampusIllustration({ label }: { label: string }) {
 
 const Campus3D = dynamic(() => import('./Campus3D'), { ssr: false, loading: () => null });
 
-export default function Campus3DLazy({ label }: { label: string }) {
+/**
+ * remember: paint the name of the school this browser last signed in to on the front wall (kept in localStorage by RememberSchool; a
+ * school's name is public, so nothing private is stored). The scene is built after that lookup so it does not flash and rebuild.
+ */
+export default function Campus3DLazy({ label, remember = false }: { label: string; remember?: boolean }) {
+  const [name, setName] = useState<string | undefined>(undefined);
+  const [looked, setLooked] = useState(!remember);
+  useEffect(() => {
+    if (!remember) return;
+    try { setName(window.localStorage.getItem('lastSchool')?.slice(0, 60) || undefined); } catch { /* blocked storage: no banner */ }
+    setLooked(true);
+  }, [remember]);
   const [failed, setFailed] = useState(false);
   const [ready, setReady] = useState(false);
   const onFail = useCallback(() => setFailed(true), []);
@@ -28,7 +39,7 @@ export default function Campus3DLazy({ label }: { label: string }) {
     <div className="campus-stage" data-ready={ready ? '1' : '0'}>
       {/* the illustration is what you see until the 3D scene has drawn its first frame (or forever, if WebGL is unavailable) */}
       <CampusIllustration label={label} />
-      {failed ? null : <div className="campus-canvas"><Campus3D label={label} onFail={onFail} onReady={onReady} /></div>}
+      {failed || !looked ? null : <div className="campus-canvas"><Campus3D label={label} onFail={onFail} onReady={onReady} name={name} /></div>}
     </div>
   );
 }

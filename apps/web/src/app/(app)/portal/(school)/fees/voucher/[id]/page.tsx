@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { Flash } from '@/components/flash';
 import { PrintButton } from '@/components/print-button';
-import { rupeesToMinor } from '@/lib/money';
+import { rupeesToMinor, minorToInput } from '@/lib/money';
 import { done, fail, getLocale, portal } from '@/lib/portal';
 import { supabaseServer } from '@/lib/supabase/server';
 import { t } from '@ilmora/i18n';
@@ -120,7 +120,7 @@ export default async function Challan({ params, searchParams }: { params: Promis
           <form action={promise} className="form card" style={{ marginTop: '1rem' }}>
             <h3 style={{ margin: 0 }}>{p.tr('finance.voucher.promise')}</h3>
             <input type="hidden" name="voucher" value={v.id} /><input type="hidden" name="family" value={v.family_id} />
-            <label>{p.tr('ui.amount')}<input name="amount" required inputMode="decimal" className="ltr" defaultValue={(balance / 100).toFixed(2)} /></label>
+            <label>{p.tr('ui.amount')}<input name="amount" required inputMode="decimal" className="ltr" defaultValue={minorToInput(balance)} /></label>
             <label>{p.tr('finance.voucher.promiseDate')}<input name="on" type="date" required className="ltr" /></label>
             <label>{p.tr('finance.concessions.reason')}<input name="note" maxLength={200} /></label>
             <button className="btn secondary">{p.tr('finance.voucher.promise')}</button>

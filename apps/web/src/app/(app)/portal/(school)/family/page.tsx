@@ -1,10 +1,19 @@
 import Link from 'next/link';
 import { Flash } from '@/components/flash';
 import type { BusStatus } from '@/lib/bus';
+import { revalidatePath } from 'next/cache';
+import { Donut } from '@/components/charts';
+import { act, str } from '@/lib/act';
 import { portal } from '@/lib/portal';
 import { BusSection } from './bus-section';
 
 export const metadata = { title: 'My family', robots: { index: false, follow: false } };
+
+async function askConcession(form: FormData) {
+  'use server';
+  await act('/portal/family', 'OK', (sb) => sb.rpc('request_concession_guardian', { p_student: str(form, 'student'), p_percent: Number(str(form, 'percent')), p_reason: str(form, 'reason') }));
+}
+void revalidatePath;
 
 /** The parent's view. Every query is plain RLS: a guardian can only ever read their own family's children, vouchers and published results. */
 export default async function Family({ searchParams }: { searchParams: Promise<{ ok?: string; err?: string }> }) {
@@ -24,9 +33,26 @@ export default async function Family({ searchParams }: { searchParams: Promise<{
   const { data: busRows } = ids.length ? await p.sb.rpc('my_bus_status') : { data: [] };
   const bus = new Map(((busRows ?? []) as BusStatus[]).map((b) => [b.student_id, b]));
 
+  const open = (vouchers ?? []).map((v) => ({ ...v, bal: Number(v.total_minor) + Number(v.adjusted_minor) - Number(v.paid_minor) })).filter((v) => v.bal > 0);
+  const today = new Date().toISOString().slice(0, 10);
+  const totalDue = open.reduce((a, v) => a + v.bal, 0);
+  const overdue = open.filter((v) => String(v.due_date) < today).reduce((a, v) => a + v.bal, 0);
+  const nextDue = open.map((v) => String(v.due_date)).sort()[0];
+  const attDays = (att ?? []).length, attOk = (att ?? []).filter((a) => a.status === 'present' || a.status === 'late').length;
+  const { data: myReq } = ids.length ? await p.sb.rpc('my_concession_requests') : { data: [] };
+  const reqs = (myReq ?? []) as { id: string; student_name: string; percent: number; reason: string; status: string; note: string | null }[];
   return (
     <>
       <h1>{p.tr('family.title')}</h1>
+      {ids.length ? (
+        <div className="stats">
+          <div className="card stat"><span className="num">{ids.length}</span><span className="label">{p.l('Children', 'بچے')}</span></div>
+          <div className="card stat"><span className="num">{p.fmt(totalDue)}</span><span className="label">{p.l('Fee due', 'واجب الادا فیس')}</span></div>
+          <div className="card stat"><span className="num" style={overdue > 0 ? { color: 'var(--danger)' } : undefined}>{p.fmt(overdue)}</span><span className="label">{p.l('Overdue', 'تاخیر شدہ')}</span></div>
+          <div className="card stat"><span className="num ltr">{nextDue ?? '—'}</span><span className="label">{p.l('Next due date', 'اگلی آخری تاریخ')}</span></div>
+          <div className="card"><Donut title={p.l('Attendance, last 30 days', 'حاضری، پچھلے 30 دن')} center={attDays ? Math.round((attOk / attDays) * 100) + '%' : '—'} parts={[{ label: p.l('Present', 'حاضر'), value: attOk, color: '#14b8a6' }, { label: p.l('Absent / leave', 'غیر حاضر / رخصت'), value: attDays - attOk, color: '#ff7b7b' }]} /></div>
+        </div>
+      ) : null}
       <Flash sp={sp} />
       {(students ?? []).length === 0 ? <p className="muted">{p.tr('ui.empty')}</p> : null}
       {(students ?? []).map((s) => {
@@ -62,6 +88,22 @@ export default async function Family({ searchParams }: { searchParams: Promise<{
           </section>
         );
       })}
+      {ids.length ? (
+        <section className="card">
+          <h2 style={{ marginTop: 0 }}>{p.l('Ask for a fee concession', 'فیس میں رعایت کی درخواست')}</h2>
+          <form action={askConcession} className="form">
+            <label>{p.l('Child', 'بچہ')}<select name="student">{(students ?? []).map((s) => <option key={s.id} value={s.id}>{s.full_name}</option>)}</select></label>
+            <label>{p.l('Percent requested (1–100)', 'درخواست کردہ فیصد (1–100)')}<input name="percent" type="number" min={1} max={100} required className="ltr" /></label>
+            <label>{p.l('Why', 'وجہ')}<input name="reason" required minLength={3} maxLength={300} /></label>
+            <button className="btn">{p.l('Send request', 'درخواست بھیجیں')}</button>
+          </form>
+          {reqs.length ? (
+            <div className="table-scroll"><table className="grid"><tbody>{reqs.map((r) => (
+              <tr key={r.id}><td>{r.student_name}</td><td className="ltr">{r.percent}%</td><td>{r.reason}</td><td><span className="pill">{({ pending: p.l('Waiting', 'زیر غور'), approved: p.l('Approved', 'منظور'), rejected: p.l('Refused', 'مسترد'), returned: p.l('Returned', 'واپس') } as Record<string, string>)[r.status] ?? r.status}</span> {r.note}</td></tr>
+            ))}</tbody></table></div>
+          ) : null}
+        </section>
+      ) : null}
     </>
   );
 }

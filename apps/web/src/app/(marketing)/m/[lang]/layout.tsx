@@ -3,6 +3,7 @@ import { t } from '@ilmora/i18n';
 import { LocaleRoot } from '@/components/locale-root';
 import { Icons } from '@/components/landing/icons';
 import { Splash } from '@/components/landing/Splash';
+import { ChatWidget } from '@/components/landing/ChatWidget';
 import { VisitBeacon } from '@/components/landing/VisitBeacon';
 import { asLocale } from '@/lib/locale';
 import { setLocale } from '@/lib/locale-action';
@@ -11,7 +12,7 @@ import { portalLoginUrl } from '@/lib/urls';
 import '../../../landing.css';
 
 // DECISION: the brand is never hard-coded; it comes from the same env var as the root layout until the Vendor Console has Brand settings.
-const product = process.env.NEXT_PUBLIC_PRODUCT_NAME ?? 'Ilmora';
+const product = process.env.NEXT_PUBLIC_PRODUCT_NAME ?? 'Ilmified';
 
 // DECISION (CPU): marketing pages are built once per language and served from cache (refreshed every 10 minutes, and at once when the
 // super admin saves the Website page). The visitor's `locale` cookie still decides the language — middleware rewrites "/pricing" to
@@ -31,7 +32,7 @@ export default async function MarketingLayout({ children, params }: { children: 
   const wa = whatsappLink(settings.whatsapp);
   const social = SOCIAL.map(([k, label]) => [label, safeUrl(settings[k])] as const).filter(([, u]) => u);
   return (
-    <LocaleRoot locale={locale}>
+    <LocaleRoot locale={locale} theme={['teal', 'violet', 'rose'].includes(settings.theme ?? '') ? settings.theme : undefined}>
       <Splash name={product} />
       <VisitBeacon lang={locale} />
       {notice ? <div className="l-notice" role="status">{notice}</div> : null}
@@ -64,6 +65,7 @@ export default async function MarketingLayout({ children, params }: { children: 
           </span>
         </div>
       </footer>
+      <ChatWidget lang={locale} whatsapp={wa} name={product} />
       {wa ? <a className="wa-float" href={wa} target="_blank" rel="noopener noreferrer" aria-label={tr('site.whatsapp')}>💬 <span>{tr('site.whatsapp')}</span></a> : null}
     </LocaleRoot>
   );

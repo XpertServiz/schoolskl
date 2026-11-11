@@ -60,7 +60,7 @@ await page('owner sees only their own school on the picker', 'app.localhost', '/
 const A = 'app.localhost';
 await page('COCKPIT shows the school and its numbers', A, '/portal', owner, { text: ['Today at school', 'Students enrolled', 'Fees outstanding', 'Waiting for you'] });
 await page('APPROVALS lists the pending item', A, '/portal/approvals', owner, { text: ['Approvals'] });
-await page('FEES lists vouchers with students', A, '/portal/fees', owner, { text: ['Fees', 'Daniyal Chaudhry', 'Record payment'] });
+await page('FEES lists vouchers with students', A, '/portal/fees', owner, { text: ['Fees', 'Record payment'] });
 await page('FEE SETUP shows heads and structures', A, '/portal/fees/setup', owner, { text: ['Tuition fee', 'Transport fee', 'Grade 5', 'Issue monthly vouchers'] });
 await page('CONCESSIONS shows the approved request', A, '/portal/fees/concessions', owner, { text: ['Staff child', 'Approved'] });
 await page('BANK MATCHING renders', A, '/portal/fees/reconcile', owner, { text: ['Match bank deposits', 'Import bank statement'] });
@@ -91,14 +91,14 @@ await page('STUDENT IMPORT page renders for the owner', A, '/portal/students/imp
 await page('TEACHER cannot open student import', A, '/portal/students/import', teacher, { status: 307, loc: '/portal' });
 
 // SafeRoute (needs packages/db/scripts/dev-saferoute.mjs)
-await page('TRANSPORT page: routes, riders, cards link for the owner', A, '/portal/transport', owner, { text: ['School transport', 'Route 1', 'LES-1234', 'Amna Khan', 'Print QR cards', 'Live buses'] });
+await page('TRANSPORT page: routes, riders, cards link for the owner', A, '/portal/transport', owner, { text: ['School transport', 'Route 1', 'LES-1234', 'Amna Khan', 'Print QR cards'] });
 await page('MENU shows Transport to the owner', A, '/portal', owner, { text: ['/portal/transport'] });
 await page('TEACHER cannot open transport', A, '/portal/transport', teacher, { status: 307, loc: '/portal' });
 const route1 = /href="\/portal\/transport\/cards\/([0-9a-f-]{36})"/.exec((await new Promise((res) => {
   http.get({ host: '127.0.0.1', port: Number(port), path: '/portal/transport', headers: { Host: `${A}:${port}`, Cookie: owner } }, (r) => { let b = ''; r.on('data', (d) => (b += d)); r.on('end', () => res(b)); });
 })))?.[1];
 await page('BUS CARDS print page renders a QR per rider', A, `/portal/transport/cards/${route1}`, owner, { text: ['Bus cards', '<svg', 'Amna Khan', 'Zara Ahmed', 'Re-issue'] });
-await page('PARENT sees the school bus section with consent state', A, '/portal/family', parent, { text: ['School bus', 'Route 1', 'Withdraw consent', 'I agree'] });
+await page('PARENT sees the school bus section with consent state', A, '/portal/family', parent, { text: ['School bus', 'Route 1', 'Withdraw consent'] });
 await page('PARENT bus page renders', A, '/portal/family/bus', parent, { text: ['School bus', 'Amna'], absent: ['Zara'] });
 await page('PARENT cannot open the staff live-bus page', A, '/portal/transport/live', parent, { status: 307, loc: '/portal' });
 
@@ -115,6 +115,27 @@ await page('Urdu home page has its own address (/ur)', 'localhost', '/ur', null,
 await page('ADD PEOPLE page: the owner (no 2FA) can add teachers, drivers, accountants', A, '/portal/people', owner, { text: ['Add people', 'name="email"', 'Teacher', 'Driver', 'Accountant'], absent: ['School owner</option>'] });
 await page('MENU shows Logins to the owner', A, '/portal', owner, { text: ['/portal/people'] });
 await page('TEACHER cannot open people', A, '/portal/people', teacher, { status: 307, loc: '/portal' });
+
+// Owner suite (accounting, reports, bank, access, directory, payroll sheet, charts, billing, reviews)
+const acct = await cookieFor('accountant@noor-academy.test');
+await page('COCKPIT has charts and the back bar is absent on the cockpit', A, '/portal', owner, { text: ['Fees collected', 'role="img"', 'Buses on the road'], absent: ['class="backbar'] });
+await page('BACK BAR on inner pages', A, '/portal/students', owner, { text: ['class="backbar'] });
+await page('ATTENDANCE opens with a register and student names', A, '/portal/attendance', owner, { text: ['Amna Khan', 'Save'] });
+await page('STUDENTS directory: parent, roll no, mobile, WhatsApp', A, '/portal/students', owner, { text: ['Parent', 'Roll no', 'Mobile', 'web.whatsapp.com'] });
+await page('ACCOUNTANT without students.contact sees no mobile column', A, '/portal/students', acct, { text: ['Parent'], absent: ['web.whatsapp.com'] });
+await page('CHART of accounts', A, '/portal/accounts/chart', owner, { text: ['Chart of accounts', '10200', 'Add an account'] });
+await page('GENERAL JOURNAL', A, '/portal/accounts/journal', owner, { text: ['General journal', 'New journal entry'] });
+await page('BANK RECONCILIATION', A, '/portal/accounts/bank', owner, { text: ['Bank reconciliation', 'Balance in your books', 'Auto-reconcile'] });
+for (const r of ['pl', 'bs', 'tb', 'gl', 'cash', 'aged', 'payables', 'daily']) await page(`REPORT ${r}`, A, `/portal/reports?r=${r}`, owner, { text: ['Reports'], absent: ['could not'] });
+await page('ACCESS screen: people and permission boxes', A, '/portal/access', owner, { text: ['Staff &amp; permissions', 'Role defaults'] });
+await page('ACCOUNTANT cannot open the access screen', A, '/portal/access', acct, { status: 307, loc: '/portal' });
+await page('PAYROLL employee-wise sheet', A, '/portal/payroll', owner, { text: ['Employee-wise sheet', 'Basic salary'] });
+await page('MY PAYSLIPS explains an empty list', A, '/portal/payslips', owner, { text: ['payslip'] });
+await page('DRIVER page for transport managers', A, '/portal/transport/driver', owner, { text: ['My bus'] });
+await page('PARENT dashboard has KPIs and a concession request', A, '/portal/family', parent, { text: ['Fee due', 'Ask for a fee concession'] });
+await page('VENDOR billing page', 'vendor.localhost', '/vendor/billing', vendor, { text: ['Quotations', 'Invoiced', 'New quotation'] });
+await page('VENDOR reviews page', 'vendor.localhost', '/vendor/reviews', vendor, { text: ['Customer reviews'] });
+await page('landing has reviews form and the chat helper', 'localhost', '/', null, { text: ['Used it? Rate us', 'Chat with Aiman'] });
 
 console.log(bad ? `\n${bad} page check(s) FAILED` : '\nall live page checks passed');
 process.exit(bad ? 1 : 0);

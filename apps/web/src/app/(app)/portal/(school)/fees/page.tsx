@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import Link from 'next/link';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
+import { minorToInput } from '@/lib/money';
 import { Flash } from '@/components/flash';
 import { done, fail, getLocale, need, portal } from '@/lib/portal';
 import { supabaseServer } from '@/lib/supabase/server';
@@ -103,7 +104,7 @@ export default async function Fees({ searchParams }: { searchParams: Promise<{ o
                         <input type="hidden" name="family" value={r.family_id} />
                         <input type="hidden" name="voucher" value={r.voucher_id} />
                         <input type="hidden" name="key" value={randomUUID()} />
-                        <input name="amount" inputMode="decimal" required pattern="\d{1,9}(\.\d{1,2})?" defaultValue={(r.balance_minor / 100).toFixed(2)} aria-label={p.tr('ui.amount')} size={9} className="ltr" />
+                        <input name="amount" inputMode="decimal" required pattern="\d{1,9}(\.\d{1,2})?" defaultValue={minorToInput(r.balance_minor)} aria-label={p.tr('ui.amount')} size={9} className="ltr" />
                         <select name="channel" aria-label={p.tr('fees.channel')}>
                           {hasDrawer ? <option value="cash">{p.tr('fees.cash')}</option> : null}
                           <option value="bank">{p.tr('fees.bank')}</option>

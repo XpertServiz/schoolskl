@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { t, type Locale } from '@ilmora/i18n';
 
-const product = process.env.NEXT_PUBLIC_PRODUCT_NAME ?? 'Ilmora';
+const product = process.env.NEXT_PUBLIC_PRODUCT_NAME ?? 'Ilmified';
 
 /** Public address of the site (no trailing slash). Set NEXT_PUBLIC_SITE_URL to the real domain when there is one. */
 export const siteUrl = () => (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://schoolskl.vercel.app').replace(/\/$/, '');

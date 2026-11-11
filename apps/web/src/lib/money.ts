@@ -5,3 +5,9 @@ export function rupeesToMinor(input: string): number | null {
   if (!m) return null;
   return Number(m[1]) * 100 + Number((m[2] ?? '').padEnd(2, '0') || '0');
 }
+
+/** Paisa → the text shown in an amount box: whole rupees when there are no paisa ("50000"), two decimals only when needed. */
+export function minorToInput(minor: number | string | bigint | null | undefined): string {
+  const n = Math.trunc(Number(minor ?? 0));
+  return n % 100 === 0 ? String(n / 100) : (n / 100).toFixed(2);
+}

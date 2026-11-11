@@ -14,6 +14,8 @@ export default async function VendorLayout({ children }: { children: React.React
           <Link href="/vendor/people">{t(locale, 'vendor.people.nav')}</Link>
           <Link href="/vendor/website">{t(locale, 'vx.nav.website')}</Link>
           <Link href="/vendor/visitors">{t(locale, 'vx.nav.visitors')}</Link>
+          <Link href="/vendor/billing">Quotes &amp; invoices</Link>
+          <Link href="/vendor/reviews">Reviews</Link>
           <Link href="/vendor/leads">{t(locale, 'vendor.leads')}</Link>
           <Link href="/vendor/plans">{t(locale, 'vendor.plans')}</Link>
           <Link href="/vendor/flags">{t(locale, 'vendor.flags')}</Link>

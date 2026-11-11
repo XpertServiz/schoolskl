@@ -50,7 +50,7 @@ describe('schema invariants (fail CI when a future migration forgets RLS)', () =
       db,
       `select distinct table_name from information_schema.role_table_grants where grantee = 'anon' and table_schema = 'public'`,
     );
-    expect(rows.map((r) => r.table_name).sort()).toEqual(['plan_features', 'plans', 'site_media', 'site_settings']);
+    expect(rows.map((r) => r.table_name).sort()).toEqual(['plan_features', 'plans', 'site_media', 'site_reviews', 'site_settings']);
   });
 
   it('anon can execute resolve_tenant and nothing else in public', async () => {

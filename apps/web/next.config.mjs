@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 export default {
   // workspace packages ship TypeScript source
-  transpilePackages: ['@ilmora/comms', '@ilmora/core', '@ilmora/i18n', '@ilmora/providers', '@ilmora/ui', '@ilmora/validation'],
+  transpilePackages: ['@ilmora/assistant', '@ilmora/comms', '@ilmora/core', '@ilmora/i18n', '@ilmora/providers', '@ilmora/ui', '@ilmora/validation'],
   poweredByHeader: false,
   async headers() {
     return [

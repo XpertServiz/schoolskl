@@ -178,3 +178,24 @@ input[type='checkbox'], input[type='radio'] { accent-color: var(--accent); width
 .kpi { font-size: 2rem; line-height: 1.1; font-family: Sora, Inter, system-ui, sans-serif; }
 .hbar { height: .7rem; border-radius: 6px; background: var(--surface-2, #1c2733); overflow: hidden; }
 .hbar span { display: block; height: 100%; background: var(--accent); border-radius: 6px; }
+
+/* back bar, alert bar, simple charts */
+.backbar { margin: 0 0 .75rem; } .backbar a { display: inline-flex; align-items: center; gap: .3rem; padding: .3rem .8rem; border: 1px solid var(--line-slate); border-radius: 999px; text-decoration: none; font-weight: 700; }
+.backbar a:hover { border-color: var(--accent); }
+.alertbar { background: rgba(255,123,123,.12); border-color: var(--danger); color: var(--ink); }
+
+/* school picker: a small galaxy, one glowing planet per school */
+.galaxy { position: relative; min-height: 100vh; display: grid; place-items: center; overflow: hidden; background: radial-gradient(ellipse at 50% 120%, #1b2440 0%, #0b1020 60%); color: #eef1ff; }
+.galaxy-stars { position: absolute; inset: 0; background-image: radial-gradient(1.5px 1.5px at 20% 30%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 70% 20%, #fff 50%, transparent 51%), radial-gradient(1.5px 1.5px at 40% 80%, #cfe 50%, transparent 51%), radial-gradient(1px 1px at 85% 65%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 10% 70%, #fff 50%, transparent 51%); background-size: 340px 340px; animation: gx 90s linear infinite; opacity: .8; }
+@keyframes gx { to { background-position: 340px 340px; } }
+.galaxy-in { position: relative; text-align: center; padding: 2rem 1rem; }
+.planets { display: flex; flex-wrap: wrap; gap: 2rem; justify-content: center; margin: 2rem 0; perspective: 800px; }
+.planet { animation: float 6s ease-in-out infinite; animation-delay: calc(var(--i) * -1.3s); }
+@keyframes float { 50% { transform: translateY(-14px) rotateY(12deg); } }
+.orb { position: relative; width: 9.5rem; height: 9.5rem; border-radius: 50%; border: 0; cursor: pointer; color: #fff; font-weight: 800; background: radial-gradient(circle at 30% 28%, #ffd27a 0%, #f59e0b 35%, #7c3aed 85%); box-shadow: inset -14px -14px 28px rgba(0,0,0,.45), 0 0 40px rgba(245,158,11,.35); transition: transform .2s; }
+.planet:nth-child(2n) .orb { background: radial-gradient(circle at 30% 28%, #a7f3d0 0%, #14b8a6 40%, #1e3a8a 90%); box-shadow: inset -14px -14px 28px rgba(0,0,0,.45), 0 0 40px rgba(20,184,166,.35); }
+.orb:hover, .orb:focus-visible { transform: scale(1.1); outline: 3px solid #fff; outline-offset: 4px; }
+.orb-name { position: relative; display: block; padding: 0 .6rem; text-shadow: 0 1px 6px rgba(0,0,0,.7); }
+@media (prefers-reduced-motion: reduce) { .galaxy-stars, .planet { animation: none; } }
+
+.chartgrid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); margin: 1.25rem 0; }

@@ -15,7 +15,7 @@ const C = { slate: 0x23303a, slate2: 0x2d3d49, paper: 0xece5d3, wall: 0xf1ead8, 
 const ease = (t: number) => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); }; // easeOutBack: overshoots, then settles
 const mat = (color: number, extra: THREE.MeshStandardMaterialParameters = {}) => new THREE.MeshStandardMaterial({ color, roughness: 0.85, metalness: 0, flatShading: true, ...extra });
 
-export default function Campus3D({ label, onFail, onReady }: { label: string; onFail?: () => void; onReady?: () => void }) {
+export default function Campus3D({ label, onFail, onReady, name }: { label: string; onFail?: () => void; onReady?: () => void; name?: string }) {
   const host = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -94,7 +94,18 @@ export default function Campus3D({ label, onFail, onReady }: { label: string; on
     const doorM = mat(0x5a3d2b);
     const door = new THREE.Mesh(new THREE.BoxGeometry(0.7, 1.2, 0.08), doorM); door.position.set(0, 0.6, 1.22); campus.add(door);
     const win = (x: number, y: number, z: number) => { const w = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.55, 0.06), glassM); w.position.set(x, y, z); campus.add(w); };
-    for (const x of [-1.8, -1.1, 1.1, 1.8]) win(x, 1.25, 1.22);
+    if (name) {
+      // the school's own name as a banner on the front wall, above the door (a canvas texture: text is drawn, never injected as HTML)
+      const bc = document.createElement('canvas'); bc.width = 1024; bc.height = 200;
+      const g2 = bc.getContext('2d')!;
+      const gr = g2.createLinearGradient(0, 0, 1024, 0); gr.addColorStop(0, '#ffc560'); gr.addColorStop(1, '#e8891a');
+      g2.fillStyle = gr; g2.fillRect(0, 0, 1024, 200); g2.strokeStyle = '#7a4a0c'; g2.lineWidth = 10; g2.strokeRect(8, 8, 1008, 184);
+      g2.textAlign = 'center'; g2.textBaseline = 'middle'; g2.fillStyle = '#1a1405';
+      let fs = 110; do { g2.font = `800 ${fs}px sans-serif`; fs -= 4; } while (g2.measureText(name).width > 940 && fs > 28);
+      g2.fillText(name, 512, 104);
+      const tex = new THREE.CanvasTexture(bc); tex.colorSpace = THREE.SRGBColorSpace;
+      const banner = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 0.82), new THREE.MeshBasicMaterial({ map: tex })); banner.position.set(0, 1.62, 1.215); campus.add(banner);
+    } else for (const x of [-1.8, -1.1, 1.1, 1.8]) win(x, 1.25, 1.22);
     for (const x of [-4.3, -3.1, 3.1, 4.3]) win(x, 1.0, 1.52);
     // steps + path to the road
     stand(1.4, 0.15, 0.6, 0, 0, 1.55, mat(0xb9b2a0), false);
@@ -178,7 +189,7 @@ export default function Campus3D({ label, onFail, onReady }: { label: string; on
       scene.traverse((o) => { const m = o as THREE.Mesh; if (m.geometry) m.geometry.dispose(); const mm = m.material; if (mm) (Array.isArray(mm) ? mm : [mm]).forEach((x) => x.dispose()); });
       renderer.dispose(); renderer.domElement.remove();
     };
-  }, [onFail, onReady]);
+  }, [onFail, onReady, name]);
 
   return <div ref={host} role="img" aria-label={label} style={{ width: '100%', height: '100%' }} />;
 }

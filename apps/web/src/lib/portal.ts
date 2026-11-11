@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
 import { cache } from 'react';
 import { redirect } from 'next/navigation';
-import { formatMoney, money } from '@ilmora/core';
+import { formatRupees, money } from '@ilmora/core';
 import { t, type Locale } from '@ilmora/i18n';
 import { requireUser } from './auth';
 import { supabaseServer } from './supabase/server';
@@ -52,9 +52,11 @@ async function portalUncached() {
     can: (key: string) => perms.has(key),
     // DECISION: an empty feature list means "no plan on file" (vendor-managed tenant) and is treated as everything-on, like app.plan_has_feature.
     has: (feature: string) => feats.size === 0 || feats.has(feature),
+    /** inline bilingual text for screens whose strings are not in the catalogue */
+    l: (en: string, ur: string) => (locale === 'ur' ? ur : en),
     flag: (key: string) => (access.flags ?? []).includes(key),
     tr: (key: string, vars: Record<string, string | number> = {}) => t(locale, key, vars),
-    fmt: (minor: number | string | bigint | null | undefined) => formatMoney(money(BigInt(Math.trunc(Number(minor ?? 0))), access.tenant.currency), fmtLocale),
+    fmt: (minor: number | string | bigint | null | undefined) => formatRupees(money(BigInt(Math.trunc(Number(minor ?? 0))), access.tenant.currency), fmtLocale),
   };
 }
 export type Portal = Awaited<ReturnType<typeof portal>>;

@@ -65,7 +65,7 @@ async function saveSettings(form: FormData) {
   const sb = await supabaseServer();
   const bad = t(await loc(), 'vx.web.bad');
   const entries: [string, string][] = [];
-  for (const k of ['whatsapp', 'phone', 'email', ...URL_KEYS, 'announcement_en', 'announcement_ur']) entries.push([k, String(form.get(k) ?? '').trim()]);
+  for (const k of ['whatsapp', 'phone', 'email', ...URL_KEYS, 'announcement_en', 'announcement_ur', 'theme']) entries.push([k, String(form.get(k) ?? '').trim()]);
   for (const [k, v] of entries) {
     if (!v) continue;
     if ((URL_KEYS as readonly string[]).includes(k) && !/^https:\/\/[^\s<>"]{4,}$/.test(v)) return go('err', bad);
@@ -147,6 +147,7 @@ export default async function Website({ searchParams }: { searchParams: Promise<
           {field('whatsapp', tr('vx.web.whatsapp'))}{field('phone', tr('vx.web.phone'))}{field('email', tr('vx.web.email'), 'email')}
           {field('facebook', tr('vx.web.facebook'))}{field('instagram', tr('vx.web.instagram'))}{field('youtube', tr('vx.web.youtube'))}{field('tiktok', tr('vx.web.tiktok'))}
           {field('announcement_en', tr('vx.web.announceEn'))}{field('announcement_ur', tr('vx.web.announceUr'))}
+          <label>Landing theme<select name="theme" defaultValue={s.theme ?? ""}><option value="">Default (saffron)</option><option value="saffron">Saffron</option><option value="teal">Teal</option><option value="violet">Violet</option><option value="rose">Rose</option></select></label>
           <p className="muted">{tr('vx.web.announceHint')}</p>
           <button className="btn">{tr('vx.web.save')}</button>
         </form>

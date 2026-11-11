@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { View } from 'react-native';
 import { startSync } from '@/lib/queue';
 import { AppProvider, useApp } from '@/lib/session';
+import { ChatFab } from '@/lib/chat';
 import { StarSky } from '@/lib/sky';
 import { AnimatedSplash } from '@/lib/splash';
 import { color, Loading } from '@/lib/ui';
@@ -17,7 +18,7 @@ function Gate() {
   const first = segments[0] as string | undefined;
   if (!session && first !== 'login') return <Redirect href={'/login' as never} />;
   // platform staff (super admin) have no school: they get their own admin area instead of the school picker
-  if (session && !access && vendorRole) return first === 'admin' ? <Slot /> : <Redirect href={'/admin' as never} />;
+  if (session && !access && vendorRole) return first === 'admin' || first === 'portal' ? <Slot /> : <Redirect href={'/admin' as never} />;
   if (session && first === 'admin' && !vendorRole) return <Redirect href={'/' as never} />;
   if (session && !access && first !== 'schools') return <Redirect href={'/schools' as never} />;
   if (session && access && first === 'login') return <Redirect href={'/' as never} />; // /schools stays reachable so a person can switch school
@@ -36,6 +37,7 @@ export default function Root() {
         <StatusBar style="light" />
         <StarSky />
         <Gate />
+        <ChatFab />
         <Splash />
       </View>
     </AppProvider>

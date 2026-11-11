@@ -18,7 +18,7 @@ export default async function Payslips() {
   return (
     <>
       <h1>{p.tr('finance.payslips.title')}</h1>
-      {sorted.length === 0 ? <p className="muted">{p.tr('ui.empty')}</p> : sorted.map((s) => (
+      {sorted.length === 0 ? <p className="muted">{mine ? p.l('No payslip has been posted for you yet. A payslip appears here after the accountant posts the month’s payroll.', 'آپ کی کوئی تنخواہ سلپ ابھی پوسٹ نہیں ہوئی۔ ماہانہ پے رول پوسٹ ہونے کے بعد یہاں نظر آئے گی۔') : p.l('Your login is not linked to a staff record, so there are no payslips to show. Ask the school owner to add you under Staff.', 'آپ کا لاگ اِن کسی اسٹاف ریکارڈ سے منسلک نہیں، اس لیے کوئی تنخواہ سلپ نہیں۔ مالک سے اسٹاف میں شامل کرنے کا کہیں۔')}</p> : sorted.map((s) => (
         <section key={s.id} className="card" style={{ marginBottom: '1rem' }}>
           <h2 style={{ marginTop: 0 }} className="ltr">{period.get(s.run_id)}</h2>
           <table className="grid"><tbody>

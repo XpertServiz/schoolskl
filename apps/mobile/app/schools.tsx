@@ -1,4 +1,4 @@
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { useApp } from '@/lib/session';
@@ -11,12 +11,14 @@ interface School { tenant_id: string; name: string }
 export default function Schools() {
   const { tr, refreshAccess, signOut, rtl } = useApp();
   const router = useRouter();
+  const { switch: wantSwitch } = useLocalSearchParams<{ switch?: string }>();
   const [schools, setSchools] = useState<School[] | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase.rpc('my_tenants').then(({ data, error }) => { if (error) setErr(error.message); else setSchools((data ?? []) as School[]); });
+    supabase.rpc('my_tenants').then(({ data, error }) => { if (error) setErr(error.message); else { const list = (data ?? []) as School[]; setSchools(list); if (list.length === 1 && !wantSwitch) void choose(list[0]!.tenant_id); } });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function choose(id: string) {

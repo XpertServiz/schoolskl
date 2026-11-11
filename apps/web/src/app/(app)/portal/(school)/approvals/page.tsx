@@ -15,11 +15,12 @@ async function decide(form: FormData) {
   'use server';
   const kind = String(form.get('kind'));
   const id = uuid.parse(form.get('id'));
-  const approve = form.get('decision') !== 'reject';
-  const sb = await supabaseServer();
+    const sb = await supabaseServer();
   const locale = await getLocale();
   let error: { message: string } | null = null;
-  if (kind === 'concession') ({ error } = await sb.rpc('approve_concession', { p_id: id, p_approve: approve }));
+  const dec = String(form.get('decision'));
+  const note = String(form.get('note') ?? '').trim();
+  if (kind === 'concession') ({ error } = await sb.rpc('decide_concession', { p_id: id, p_decision: dec === 'reject' ? 'reject' : dec === 'return' ? 'return' : 'approve', p_note: note }));
   else if (kind === 'payroll') ({ error } = await sb.rpc('post_payroll', { p_run: id }));
   else if (kind === 'results') ({ error } = await sb.rpc('publish_results', { p_exam: id }));
   else return fail(here, { message: 'unknown approval kind' });
@@ -59,7 +60,13 @@ export default async function Approvals({ searchParams }: { searchParams: Promis
                           <button name="decision" value="approve" className="btn small">
                             {i.kind === 'payroll' ? p.tr('approvals.post') : i.kind === 'results' ? p.tr('approvals.publish') : p.tr('approvals.approve')}
                           </button>
-                          {i.kind === 'concession' ? <button name="decision" value="reject" className="btn secondary small">{p.tr('approvals.reject')}</button> : null}
+                          {i.kind === 'concession' ? (
+                            <>
+                              <input name="note" placeholder={p.l('Note (needed to return)', 'نوٹ (واپس بھیجنے کے لیے)')} maxLength={300} />
+                              <button name="decision" value="reject" className="btn secondary small">{p.tr('approvals.reject')}</button>
+                              <button name="decision" value="return" className="btn secondary small">{p.l('Return with note', 'نوٹ کے ساتھ واپس')}</button>
+                            </>
+                          ) : null}
                         </form>
                       ) : <span className="muted">{i.blocked_reason}</span>}
                   </td>

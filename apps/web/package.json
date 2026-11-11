@@ -9,6 +9,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@ilmora/assistant": "*",
     "@ilmora/comms": "*",
     "@ilmora/core": "*",
     "@ilmora/i18n": "*",

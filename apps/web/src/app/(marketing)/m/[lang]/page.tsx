@@ -8,6 +8,7 @@ import { MediaEmbed } from '@/components/landing/MediaEmbed';
 import { PhoneMock } from '@/components/landing/PhoneMock';
 import { embedFor } from '@/lib/embed';
 import { homeJsonLd, seo } from '@/lib/seo';
+import { RateForm } from '@/components/landing/RateForm';
 import { getSiteContent } from '@/lib/site-content';
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
@@ -25,7 +26,7 @@ const TILES = [
 export default async function Home({ params }: { params: Promise<{ lang: string }> }) {
   const locale: Locale = asLocale((await params).lang);
   const tr = (k: string, v?: Record<string, string | number>) => t(locale, k, v);
-  const { media } = await getSiteContent();
+  const { media, reviews } = await getSiteContent();
   const demo = media.filter((m) => m.kind === 'demo');
   const reels = media.filter((m) => m.kind === 'reel');
   const title = (m: { title_en: string; title_ur: string }) => (locale === 'ur' && m.title_ur ? m.title_ur : m.title_en);
@@ -110,6 +111,20 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
           <span>{Icons.hand}{tr('marketing.v2.trust.consent')}</span>
           <span>{Icons.lock}{tr('marketing.v2.trust.locked')}</span>
         </div>
+      </section>
+
+      <section className="l-section l-wrap" aria-labelledby="reviews-h">
+        <h2 id="reviews-h" style={{ textAlign: "center" }}>{locale === "ur" ? "صارفین کیا کہتے ہیں" : "What schools say"}</h2>
+        {reviews.length ? (
+          <div className="reviews">{reviews.map((r, i) => (
+            <figure key={i} className="review" style={{ margin: 0 }}>
+              <div className="stars" aria-label={`${r.rating}/5`}>{"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)}</div>
+              <blockquote style={{ margin: ".5rem 0" }}>{r.comment}</blockquote>
+              <figcaption className="muted">{r.name}{r.school_name ? ` · ${r.school_name}` : ""}</figcaption>
+            </figure>
+          ))}</div>
+        ) : null}
+        <RateForm lang={locale} />
       </section>
 
       <div className="l-wrap">

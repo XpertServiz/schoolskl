@@ -25,8 +25,9 @@ export default function More() {
           </View>
           <Muted>{tr('mobile.more.signedIn')}</Muted>
         </Card>
+        <Button icon="globe-outline" label={locale === 'ur' ? 'مکمل ویب پورٹل (تمام آپشنز)' : 'Full web portal (all options)'} onPress={() => router.push('/portal' as never)} />
         <Button secondary icon="language-outline" label={tr('nav.language')} onPress={() => void setLocale(locale === 'ur' ? 'en' : 'ur')} />
-        <Button secondary icon="swap-horizontal-outline" label={tr('nav.switchSchool')} onPress={() => router.push('/schools' as never)} />
+        <Button secondary icon="swap-horizontal-outline" label={tr('nav.switchSchool')} onPress={() => router.push('/schools?switch=1' as never)} />
         <Button secondary danger icon="log-out-outline" label={tr('nav.signOut')} onPress={() => void signOut()} />
         <Card>
           <View style={{ flexDirection: rtl ? 'row-reverse' : 'row', gap: 10, alignItems: 'flex-start' }}>

@@ -17,6 +17,7 @@ export const PERMISSION_KEYS = [
   'comms.broadcast', 'comms.emergency',
   'website.edit', 'website.publish', 'website.delete',
   'users.manage', 'roles.manage', 'settings.manage', 'data.export', 'data.import', 'audit.view', 'api.keys.manage',
+  'staff.manage', 'students.contact', 'accounts.chart.edit',
 ] as const;
 
 export type PermissionKey = (typeof PERMISSION_KEYS)[number];

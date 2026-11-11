@@ -58,3 +58,13 @@ export function formatMoney(m: Money, locale = 'en-PK'): string {
   const grouped = new Intl.NumberFormat(locale, { useGrouping: true }).format(BigInt(whole));
   return `${neg ? '-' : ''}${m.currency} ${grouped}${frac ? '.' + frac : ''}`;
 }
+
+/** Display-only: whole rupees, no decimals ("PKR 50,000"). Rounds half away from zero. The ledger keeps exact paisa; this is only what people read. */
+export function formatRupees(m: Money, locale = 'en-PK'): string {
+  const digits = minorDigits(m.currency);
+  const unit = 10n ** BigInt(digits);
+  const neg = m.minor < 0n;
+  const abs = neg ? -m.minor : m.minor;
+  const whole = (abs + unit / 2n) / unit;
+  return `${neg && whole > 0n ? '-' : ''}${m.currency} ${new Intl.NumberFormat(locale, { useGrouping: true }).format(whole)}`;
+}

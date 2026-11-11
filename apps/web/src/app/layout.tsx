@@ -7,7 +7,7 @@ import './globals.css';
 
 // DECISION: the product name is never hard-coded (CLAUDE.md header). It comes from NEXT_PUBLIC_PRODUCT_NAME until
 // the Vendor Console → Brand settings exist (Phase 1 follow-up).
-const product = process.env.NEXT_PUBLIC_PRODUCT_NAME ?? 'Ilmora';
+const product = process.env.NEXT_PUBLIC_PRODUCT_NAME ?? 'Ilmified';
 
 export const metadata: Metadata = {
   title: { default: product, template: `%s · ${product}` },

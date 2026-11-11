@@ -32,7 +32,7 @@ check('every tenant table: tenant_id NOT NULL, leading index, ≥1 policy',
              or not exists (select 1 from pg_policies p where p.schemaname='public' and p.tablename=c.table_name)
              or not exists (select 1 from pg_index i join pg_class tc on tc.oid=i.indrelid join pg_attribute a on a.attrelid=tc.oid and a.attnum=i.indkey[0] where tc.relname=c.table_name and a.attname='tenant_id'))`));
 check('anon can read only public marketing content (pricing, landing media, website settings)',
-  await q(`select distinct table_name from information_schema.role_table_grants where grantee='anon' and table_schema='public'`), ['plan_features', 'plans', 'site_media', 'site_settings']);
+  await q(`select distinct table_name from information_schema.role_table_grants where grantee='anon' and table_schema='public'`), ['plan_features', 'plans', 'site_media', 'site_reviews', 'site_settings']);
 check('anon can execute only resolve_tenant in public',
   await q(`select p.proname from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='public' and has_function_privilege('anon',p.oid,'execute')`), ['resolve_tenant']);
 check('signed-in users can execute only the 8 policy helpers in schema app',

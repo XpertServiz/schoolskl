@@ -3,7 +3,7 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { t } from '@ilmora/i18n';
 import { Flash } from '@/components/flash';
-import { BusMap, ageText } from '@/components/bus-map';
+import { LiveBuses } from '@/components/live-buses';
 import { done, fail, getLocale, need, portal } from '@/lib/portal';
 import { supabaseServer } from '@/lib/supabase/server';
 
@@ -28,11 +28,11 @@ async function addRoute(form: FormData) {
 
 async function updateRoute(form: FormData) {
   'use server';
-  const r = z.object({ id: uuid, vehicle: z.string().max(30).nullable(), driver: uuid.nullable(), attendant: uuid.nullable() })
-    .safeParse({ id: form.get('id'), vehicle: opt(form.get('vehicle')), driver: opt(form.get('driver')), attendant: opt(form.get('attendant')) });
+  const r = z.object({ id: uuid, vehicle: z.string().max(30).nullable(), driver: uuid.nullable(), attendant: uuid.nullable(), arrival: z.string().regex(/^d{2}:d{2}$/).nullable(), grace: z.coerce.number().int().min(0).max(180) })
+    .safeParse({ id: form.get('id'), vehicle: opt(form.get('vehicle')), driver: opt(form.get('driver')), attendant: opt(form.get('attendant')), arrival: opt(form.get('arrival')), grace: form.get('grace') || 25 });
   if (!r.success) return fail(here, { message: 'invalid' });
   const sb = await supabaseServer();
-  const { error } = await sb.from('transport_routes').update({ vehicle_label: r.data.vehicle, driver_staff_id: r.data.driver, attendant_staff_id: r.data.attendant }).eq('id', r.data.id);
+  const { error } = await sb.from('transport_routes').update({ vehicle_label: r.data.vehicle, driver_staff_id: r.data.driver, attendant_staff_id: r.data.attendant, expected_arrival: r.data.arrival, grace_minutes: r.data.grace }).eq('id', r.data.id);
   if (error) return fail(here, error);
   revalidatePath(here);
   done(here, t(await getLocale(), 'transport.saved'));
@@ -68,7 +68,7 @@ export default async function Transport({ searchParams }: { searchParams: Promis
   const sp = await searchParams;
   const manage = p.can('transport.manage');
   const [{ data: routes }, { data: riders }, { data: staff }, { data: students }, live] = await Promise.all([
-    p.sb.from('transport_routes').select('id, name, vehicle_label, driver_staff_id, attendant_staff_id, is_active').order('name'),
+    p.sb.from('transport_routes').select('id, name, vehicle_label, driver_staff_id, attendant_staff_id, is_active, expected_arrival, grace_minutes').order('name'),
     manage ? p.sb.from('transport_riders').select('student_id, route_id, stop_name') : Promise.resolve({ data: [] }),
     manage ? p.sb.from('staff_members').select('id, full_name, user_id, status').eq('status', 'active').order('full_name') : Promise.resolve({ data: [] }),
     manage ? p.sb.from('students').select('id, full_name, admission_no').eq('status', 'enrolled').order('full_name') : Promise.resolve({ data: [] }),
@@ -92,20 +92,7 @@ export default async function Transport({ searchParams }: { searchParams: Promis
       {!p.flag('saferoute') ? <p role="status" className="notice">{p.tr('transport.off')}</p> : null}
       <p className="muted">{p.tr('transport.how')}</p>
 
-      {p.can('tracking.live.view') && p.flag('saferoute') ? (
-        <section className="card">
-          <h2>{p.tr('transport.live')}</h2>
-          {trips.length === 0 ? <p className="muted">{p.tr('transport.noLive')}</p> : null}
-          {trips.map((tr) => (
-            <div key={tr.trip_id} style={{ marginBottom: '1rem' }}>
-              <h3 style={{ marginBottom: '.25rem' }}>{tr.route_name} <span className="muted ltr">{tr.vehicle_label}</span> · {p.tr(`transport.dir.${tr.direction}`)}</h3>
-              <p className="muted">{p.tr('transport.onBoard', { n: tr.on_board, total: tr.riders })} · {tr.position_at ? p.tr('transport.updated', { time: ageText(tr.position_at, p.locale) }) : p.tr('transport.noFix')}</p>
-              {tr.lat != null && tr.lng != null ? <BusMap lat={tr.lat} lng={tr.lng} label={tr.route_name} /> : null}
-            </div>
-          ))}
-          {trips.length ? <p><Link href="/portal/transport/live">{p.tr('transport.family.openMap')}</Link></p> : null}
-        </section>
-      ) : null}
+      {p.can('tracking.live.view') ? <LiveBuses p={p} open /> : null}
 
       <h2>{p.tr('transport.routes')}</h2>
       {(routes ?? []).length === 0 ? <p className="muted">{p.tr('ui.empty')}</p> : null}
@@ -121,6 +108,8 @@ export default async function Transport({ searchParams }: { searchParams: Promis
                   <label>{p.tr('transport.vehicle')} <input name="vehicle" defaultValue={r.vehicle_label ?? ''} maxLength={30} /></label>
                   <label>{p.tr('transport.driver')} {staffSelect('driver', r.driver_staff_id)}</label>
                   <label>{p.tr('transport.attendant')} {staffSelect('attendant', r.attendant_staff_id)}</label>
+                  <label>{p.l('Expected at school', 'اسکول پہنچنے کا وقت')} <input type="time" name="arrival" defaultValue={r.expected_arrival?.slice(0, 5) ?? ''} className="ltr" /></label>
+                  <label>{p.l('Grace (min)', 'مہلت (منٹ)')} <input type="number" name="grace" min={0} max={180} defaultValue={r.grace_minutes ?? 25} className="ltr" style={{ width: '5rem' }} /></label>
                   <button className="btn secondary">{p.tr('transport.save')}</button>
                 </form>
                 <h4>{p.tr('transport.riders')} ({mine.length})</h4>
