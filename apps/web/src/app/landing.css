@@ -18,6 +18,7 @@
 .l-header .l-wrap { display: flex; align-items: center; gap: 1.25rem; min-height: 4rem; }
 .l-brand { display: inline-flex; align-items: center; gap: .6rem; font-weight: 800; font-size: 1.15rem; color: var(--ink); text-decoration: none; }
 .l-brand svg { width: 30px; height: 30px; }
+.brand-mark { height: 30px; width: auto; object-fit: contain; display: block; filter: drop-shadow(0 0 8px color-mix(in srgb, #F5A524 35%, transparent)); }
 .l-nav { display: flex; gap: 1.25rem; flex: 1; flex-wrap: wrap; }
 .l-nav a { color: var(--ink-2); text-decoration: none; padding: .4rem 0; border-bottom: 2px solid transparent; }
 .l-nav a:hover { color: var(--ink); border-bottom-color: var(--accent); }

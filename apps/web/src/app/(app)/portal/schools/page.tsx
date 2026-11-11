@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { t, type Locale } from '@ilmora/i18n';
+import { AutoSubmit } from '@/components/auto-submit';
 import { requireUser } from '@/lib/auth';
 import { supabaseServer } from '@/lib/supabase/server';
 
@@ -48,7 +49,7 @@ export default async function Schools({ searchParams }: { searchParams: Promise<
         </div>
         {list.length === 0 ? <p className="muted">{t(locale, 'tenant.notFound')}</p> : null}
         {vendor ? <p><a className="btn secondary" href="/vendor">Vendor Console</a></p> : null}
-        {auto ? <script dangerouslySetInnerHTML={{ __html: "var f=document.getElementById('auto');if(f)f.requestSubmit?f.requestSubmit():f.submit()" }} /> : null}
+        {auto ? <AutoSubmit formId="auto" /> : null}
       </div>
     </div>
   );

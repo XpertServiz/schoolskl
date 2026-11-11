@@ -69,7 +69,7 @@ export default async function SchoolLayout({ children }: { children: React.React
       <NavBehavior />
       <RememberSchool name={p.access.tenant.name} />
       <header className="topbar">
-        <strong>{p.access.tenant.name}</strong>
+        <strong style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem' }}>{/* eslint-disable-next-line @next/next/no-img-element */}<img src="/logo-mark.png" alt="" height={24} style={{ height: 24, width: 'auto' }} />{p.access.tenant.name}</strong>
         <nav aria-label="Main">
           {top.filter((i) => i.show).map((i) => <Link key={i.href} href={i.href}>{i.label}</Link>)}
           {groups.map((g) => {

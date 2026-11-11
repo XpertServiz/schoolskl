@@ -21,5 +21,5 @@ export const Icons = {
   admissions: I(<><rect x="5" y="4" width="14" height="17" rx="2" /><path d="M9 4.5V3h6v1.5M9 10h6M9 14h4" /><path d="M15.5 17.5l1.5 1.5 3-3" /></>),
   timetable: I(<><circle cx="12" cy="12" r="8.5" /><path d="M12 7.5V12l3 2" /></>),
   compass: I(<><circle cx="12" cy="12" r="9" /><path d="M15.5 8.5l-2 5-5 2 2-5z" /></>),
-  logo: <svg viewBox="0 0 120 110" aria-hidden="true"><g fill="none" stroke="#F5A524" strokeWidth="9" strokeLinejoin="round" strokeLinecap="round"><path d="M14 52 60 18l46 34M24 50v42h72V50M52 92V68h16v24M60 18V4M10 98h100" /></g><path d="M60 4l22 7-22 7z" fill="#F5A524" /></svg>,
+  logo: <img src="/logo-mark.png" alt="" width="34" height="26" className="brand-mark" />,
 };

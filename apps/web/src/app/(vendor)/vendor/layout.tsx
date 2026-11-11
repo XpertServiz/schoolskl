@@ -7,7 +7,7 @@ export default async function VendorLayout({ children }: { children: React.React
   return (
     <>
       <header className="topbar">
-        <strong>{t(locale, 'vendor.console')}</strong>
+        <strong style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem' }}>{/* eslint-disable-next-line @next/next/no-img-element */}<img src="/logo-mark.png" alt="" height={24} style={{ height: 24, width: 'auto' }} />{t(locale, 'vendor.console')}</strong>
         <nav aria-label="Vendor">
           <Link href="/vendor">{t(locale, 'vx.nav.dashboard')}</Link>
           <Link href="/vendor/tenants">{t(locale, 'vendor.tenants')}</Link>
